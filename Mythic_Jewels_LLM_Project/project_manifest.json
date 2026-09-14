@@ -1,0 +1,20 @@
+{
+  "project": "Mythic Jewels",
+  "version": "0.1.0",
+  "purpose": "LLM-driven development specification",
+  "entrypoint": "00_MASTER/CHIEF_PROMPT.md",
+  "build_order": "00_MASTER/BUILD_ORDER.md",
+  "platforms": [
+    "Android",
+    "iOS"
+  ],
+  "engine": "Unity LTS",
+  "real_money_gambling": false,
+  "mvp": {
+    "levels": 50,
+    "worlds": 1,
+    "heroes": 3,
+    "bosses": 5
+  },
+  "file_count": 27
+}

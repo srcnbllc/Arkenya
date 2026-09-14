@@ -1,0 +1,48 @@
+{
+  "devDependencies": {
+    "jsdom": "^30.0.1"
+  },
+  "name": "mythic_jewels_llm_project",
+  "description": "Bu klasör, Android ve iOS için geliştirilecek **Mythic Jewels** adlı özgün, oyun içi sanal ekonomi kullanan, gerçek para bahis/kumar içermeyen, fantastik Match-3 + macera + kahraman + boss + hazine + bölüm ilerleme oyununun uçtan uca üretim kaynağıdır.",
+  "version": "1.0.0",
+  "main": "fix_arkenya.js",
+  "dependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/cli": "^8.5.2",
+    "@capacitor/core": "^8.5.2",
+    "@capacitor/ios": "^8.5.2",
+    "bidi-js": "^1.1.0",
+    "css-tree": "^3.2.1",
+    "data-urls": "^7.0.0",
+    "decimal.js": "^10.6.0",
+    "entities": "^8.1.0",
+    "html-encoding-sniffer": "^6.0.0",
+    "is-potential-custom-element-name": "^1.0.1",
+    "lru-cache": "^11.5.2",
+    "mdn-data": "^2.27.1",
+    "parse5": "^8.0.1",
+    "punycode": "^2.3.1",
+    "require-from-string": "^2.0.2",
+    "saxes": "^6.0.0",
+    "source-map-js": "^1.2.1",
+    "symbol-tree": "^3.2.4",
+    "tldts": "^7.4.13",
+    "tldts-core": "^7.4.13",
+    "tough-cookie": "^6.0.2",
+    "tr46": "^6.0.0",
+    "undici": "^8.10.2",
+    "w3c-xmlserializer": "^5.0.0",
+    "webidl-conversions": "^8.0.1",
+    "whatwg-mimetype": "^5.0.0",
+    "whatwg-url": "^17.1.1",
+    "xml-name-validator": "^5.0.0",
+    "xmlchars": "^2.2.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
