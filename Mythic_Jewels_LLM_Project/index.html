@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>ARKENYA: MYTHIC JEWELS — Candy Crush & Zeus Patlatma Efektli Oynanış</title>
     <style>
         :root {
@@ -23,6 +23,8 @@
             padding: 0;
             user-select: none;
             -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
@@ -30,15 +32,16 @@
             background: #04060a;
             color: #ffffff;
             min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 10px;
-            overflow-x: hidden;
+            overflow: hidden;
         }
 
-        /* Mobile Emulator Device Frame */
+        /* Mobile Emulator Device Frame & Responsive Mobile Layout */
         .emulator-container {
             position: relative;
             width: 420px;
@@ -50,6 +53,74 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+        }
+
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 0;
+                margin: 0;
+                background: #090e1a;
+            }
+            .emulator-container {
+                width: 100vw;
+                max-width: 500px;
+                height: 100vh;
+                height: 100dvh;
+                border: none;
+                border-radius: 0;
+                box-shadow: none;
+                padding-top: env(safe-area-inset-top);
+                padding-bottom: env(safe-area-inset-bottom);
+                padding-left: env(safe-area-inset-left);
+                padding-right: env(safe-area-inset-right);
+            }
+        }
+
+        /* Mobile Touch Optimization */
+        button, .btn-action, .nav-item, .stage-card {
+            touch-action: manipulation;
+        }
+
+        /* Hide Simulated Hardware Notch & Status Bar Globally */
+        .notch, .phone-header, .phone-footer-bar {
+            display: none !important;
+        }
+
+        /* Touch Active Feedback on Buttons */
+        button:active, .btn-action:active, .nav-item:active, .stage-card:active {
+            transform: scale(0.96);
+            opacity: 0.9;
+        }
+
+        /* Toast Container */
+        #toast-container {
+            position: absolute;
+            top: 55px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: none;
+            width: 90%;
+            max-width: 340px;
+        }
+        .toast-msg {
+            background: rgba(15, 22, 38, 0.95);
+            color: #fff;
+            border: 1px solid var(--gold-primary);
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            animation: toastIn 0.3s ease-out forwards;
+        }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Phone Notch & Status Bar */
@@ -122,10 +193,47 @@
             overflow-x: hidden;
             padding-top: 80px;
             padding-bottom: 80px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
         }
 
         .screen.active {
             display: flex;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Screen Wipe Fade */
+        .screen-wipe {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #000;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .screen-wipe.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Animations */
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            70% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes starDrop {
+            0% { transform: scale(3) translateY(-50px) rotate(45deg); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: scale(1) translateY(0) rotate(0deg); opacity: 1; }
         }
 
         /* Top HUD Bar */
@@ -257,8 +365,12 @@
 
         /* SCREEN 2: MAIN MENU */
         #screen-mainmenu {
-            background-image: url('Assets/Art/arkenya_main_menu_1788972680863.png');
+            background-image: url('Assets/Art/main_menu_clean_bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             justify-content: flex-end;
+            padding-bottom: 85px;
         }
 
         .menu-center-hero {
@@ -266,151 +378,114 @@
             flex-direction: column;
             justify-content: flex-end;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
+            width: 100%;
+            z-index: 20;
         }
 
+        /* Rich Mythological Golden Relief Button */
         .mythic-btn-gold {
             width: 90%;
             max-width: 320px;
-            height: 52px;
-            background: linear-gradient(180deg, #ffe885 0%, #d49b13 100%);
-            border: 2.5px solid #ffffff;
-            border-radius: 26px;
-            color: #1a0f00;
-            font-size: 15px;
+            height: 54px;
+            background: linear-gradient(180deg, #fff3a3 0%, #f5c542 35%, #b8820c 75%, #684500 100%);
+            border: 2px solid #ffe885;
+            border-radius: 27px;
+            color: #1a0800;
+            font-size: 16px;
             font-weight: 900;
             cursor: pointer;
-            box-shadow: 0 6px 22px rgba(245, 197, 66, 0.7), inset 0 2px 4px #fff;
-            letter-spacing: 0.5px;
+            box-shadow: 0 0 20px rgba(245, 197, 66, 0.6), inset 0 2px 4px #ffffff, 0 8px 24px rgba(0, 0, 0, 0.9);
+            letter-spacing: 1px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            transition: transform 0.1s, filter 0.1s;
+            transition: all 0.15s ease-in-out;
             margin: 6px auto;
-            text-shadow: 0 1px 1px rgba(255,255,255,0.6);
+            text-shadow: 0 1px 1px rgba(255,255,255,0.7);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            text-transform: uppercase;
         }
 
         .mythic-btn-gold:active {
             transform: scale(0.95);
+            box-shadow: 0 0 10px rgba(245, 197, 66, 0.4);
         }
 
-        .mythic-btn-green {
-            width: 90%;
-            max-width: 320px;
-            height: 52px;
-            background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%);
-            border: 2.5px solid #ffffff;
-            border-radius: 26px;
-            color: #ffffff;
-            font-size: 15px;
-            font-weight: 900;
-            cursor: pointer;
-            box-shadow: 0 6px 22px rgba(46, 204, 113, 0.6), inset 0 2px 4px rgba(255,255,255,0.6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: transform 0.1s;
-            margin: 6px auto;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .mythic-btn-green:active {
-            transform: scale(0.95);
-        }
-
+        /* Mythic Sub Button (Hero Select) */
         .mythic-btn-sub {
             width: 90%;
             max-width: 320px;
-            height: 44px;
-            background: rgba(15, 22, 38, 0.94);
-            border: 1.5px solid var(--gold-primary);
-            border-radius: 22px;
-            color: var(--gold-light);
+            height: 48px;
+            background: linear-gradient(180deg, rgba(20, 32, 54, 0.95) 0%, rgba(8, 14, 26, 0.98) 100%);
+            border: 1.5px solid #00d2ff;
+            border-radius: 24px;
+            color: #00d2ff;
             font-size: 13px;
             font-weight: 800;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 8px;
             margin: 6px auto;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.6);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.35), inset 0 1px 3px rgba(255,255,255,0.2);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            transition: all 0.15s ease-in-out;
         }
 
         .mythic-btn-sub:active {
             transform: scale(0.95);
         }
 
-        .play-btn-main {
-            width: 250px;
-            height: 60px;
-            background: linear-gradient(180deg, #ffe066 0%, #d49b13 100%);
-            border: 3px solid #ffffff;
-            border-radius: 30px;
-            color: #1a0f00;
-            font-size: 20px;
-            font-weight: 900;
-            cursor: pointer;
-            box-shadow: 0 8px 25px rgba(245, 197, 66, 0.8), inset 0 2px 4px #fff;
-            letter-spacing: 1px;
-            transition: transform 0.1s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .play-btn-main:active {
-            transform: scale(0.95);
-        }
-
-        .btn-sub-map {
-            width: 210px;
-            height: 42px;
-            background: rgba(0, 0, 0, 0.85);
-            border: 1.5px solid var(--gold-primary);
-            border-radius: 21px;
-            color: var(--gold-light);
-            font-size: 13px;
-            font-weight: 800;
-            cursor: pointer;
+        .mythic-btn-sub:disabled, .mythic-btn-gold:disabled {
+            opacity: 0.6;
+            filter: grayscale(80%);
+            cursor: not-allowed;
+            box-shadow: none;
+            background: #1e293b;
+            color: #64748b;
+            border-color: #334155;
+            pointer-events: none;
         }
 
         .reset-btn-link {
             font-size: 11px;
-            color: #ff6b81;
-            background: rgba(0,0,0,0.75);
-            border: 1px solid #ff4757;
-            padding: 6px 14px;
-            border-radius: 14px;
+            color: #94a3b8;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(245, 197, 66, 0.3);
+            padding: 6px 16px;
+            border-radius: 20px;
             cursor: pointer;
             margin-top: 4px;
+            transition: all 0.15s ease;
+        }
+        .reset-btn-link:hover {
+            border-color: var(--gold-primary);
+            color: var(--gold-light);
         }
 
-        /* Global Fixed Bottom Nav Bar */
+        /* Global Fixed Bottom Nav Bar - Mythic Greek Frieze Pedestal */
         .bottom-nav {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 70px;
-            background: rgba(7, 10, 18, 0.96);
-            border-top: 2px solid var(--gold-dark);
+            height: 72px;
+            background: linear-gradient(180deg, rgba(15, 22, 38, 0.98) 0%, rgba(4, 6, 10, 1) 100%);
+            border-top: 2.5px solid var(--gold-primary);
+            box-shadow: 0 -4px 25px rgba(245, 197, 66, 0.3), inset 0 1px 2px rgba(255,255,255,0.2);
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding-bottom: 10px;
+            padding-bottom: 8px;
             z-index: 400;
             box-sizing: border-box;
         }
@@ -419,68 +494,85 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 2px;
+            justify-content: center;
+            gap: 3px;
             color: #8fa0c2;
-            font-size: 10px;
-            font-weight: 700;
+            font-size: 11px;
+            font-weight: 800;
             cursor: pointer;
+            padding: 4px 12px;
+            border-radius: 12px;
+            transition: all 0.2s ease-in-out;
         }
 
-        .nav-item.active, .nav-item:hover {
-            color: var(--gold-primary);
+        .nav-item.active {
+            color: var(--gold-light);
+            background: rgba(245, 197, 66, 0.15);
+            border: 1px solid rgba(245, 197, 66, 0.4);
+            box-shadow: 0 0 12px rgba(245, 197, 66, 0.4);
+            text-shadow: 0 0 8px rgba(245, 197, 66, 0.8);
         }
 
         .nav-icon {
-            font-size: 20px;
+            font-size: 22px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
         }
 
         /* SCREEN 3: WORLD MAP WITH DUAL TABS & MYTHIC WOODEN CARDS */
+        /* SCREEN 3: WORLD MAP WITH DUAL TABS & MYTHIC GLASS TABLET CARDS */
         #screen-worldmap {
             background-image: url('Assets/Art/mythic_map_bg.png');
             background-size: cover;
-            background-position: center;
+            background-position: center top;
             background-attachment: scroll;
+            padding-top: 0 !important;
         }
 
         .map-top-bar {
             position: sticky;
             top: 0;
-            z-index: 200;
+            z-index: 250;
             display: flex;
             justify-content: center;
-            gap: 10px;
-            padding: 10px 15px;
-            background: rgba(7, 10, 18, 0.92);
-            backdrop-filter: blur(8px);
-            border-bottom: 1.5px solid var(--gold-dark);
+            gap: 12px;
+            padding: 12px 16px 8px;
+            background: transparent;
+            backdrop-filter: none;
+            border-bottom: none;
         }
 
         .map-tab-btn {
             flex: 1;
-            padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(245, 197, 66, 0.3);
-            border-radius: 12px;
-            color: #aaa;
-            font-size: 11px;
+            padding: 10px 14px;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(8px);
+            border: 1.5px solid rgba(245, 197, 66, 0.4);
+            border-radius: 20px;
+            color: #cbd5e1;
+            font-size: 12px;
             font-weight: 800;
             cursor: pointer;
             text-align: center;
-            transition: all 0.2s;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+            letter-spacing: 0.5px;
         }
 
         .map-tab-btn.active {
-            background: linear-gradient(180deg, #f5c542, #c99318);
-            color: #000;
-            border-color: #fff;
-            box-shadow: 0 0 15px rgba(245, 197, 66, 0.6);
+            background: linear-gradient(180deg, #ffe885 0%, #d49b13 100%);
+            color: #1a0800;
+            border-color: #ffffff;
+            box-shadow: 0 0 20px rgba(245, 197, 66, 0.85);
+            font-weight: 900;
         }
 
+        /* VISUAL MAP - DYNAMIC NODES & TRAIL */
         .map-scroll-area {
             position: relative;
             width: 100%;
-            height: 3400px;
-            padding: 20px 20px 100px;
+            height: 3800px; /* Tall enough for 50 levels spaced out */
+            display: block;
+            overflow: hidden; /* Path shouldn't overflow horiz */
         }
 
         .map-svg-trail {
@@ -490,7 +582,16 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 5;
+            z-index: 1;
+        }
+
+        #map-nodes-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
         }
 
         .map-node {
@@ -498,87 +599,108 @@
             width: 48px;
             height: 48px;
             border-radius: 50%;
-            background: radial-gradient(circle, #2a364f, #121929);
-            border: 3px solid #4a5c80;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(4, 6, 10, 0.9));
+            border: 2px solid var(--gold-dark);
+            color: #fff;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-weight: 800;
-            font-size: 14px;
-            color: #64748b;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            cursor: not-allowed;
-            transition: transform 0.2s;
-            z-index: 10;
+            font-size: 16px;
+            font-weight: 900;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.8), inset 0 0 10px rgba(0,0,0,0.8);
+            transform: translate(-50%, -50%);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            backdrop-filter: blur(4px);
         }
 
         .map-node.unlocked {
-            background: radial-gradient(circle, #ffe066, #d49b13);
-            border-color: #ffffff;
-            color: #1a0f00;
-            cursor: pointer;
-            box-shadow: 0 0 20px rgba(245, 197, 66, 0.9);
-            animation: pulseGlow 1.5s infinite alternate;
+            background: linear-gradient(135deg, #f5c542, #b8820c);
+            color: #1a0800;
+            border-color: #fff;
+            box-shadow: 0 0 20px rgba(245, 197, 66, 0.7), inset 0 2px 5px rgba(255,255,255,0.6);
+            text-shadow: 0 1px 1px rgba(255,255,255,0.8);
+        }
+
+        .map-node.completed {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: #fff;
+            border-color: #f5c542;
+            box-shadow: 0 0 15px rgba(46, 204, 113, 0.5), inset 0 2px 4px rgba(255,255,255,0.3);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .map-node.boss {
+            width: 64px;
+            height: 64px;
+            font-size: 20px;
+            background: linear-gradient(135deg, #e74c3c, #900);
+            color: #fff;
+            border-color: #f5c542;
+            box-shadow: 0 0 25px rgba(231, 76, 60, 0.8), inset 0 2px 6px rgba(255,255,255,0.5);
+            border-width: 3px;
+        }
+
+        .map-node.boss.unlocked {
+             background: linear-gradient(135deg, #ff6b81, #e74c3c);
         }
 
         .map-node.active-target {
-            border-color: #ffffff;
-            box-shadow: 0 0 25px rgba(255, 232, 133, 1), 0 0 40px rgba(245, 197, 66, 0.9);
-            animation: targetGlowPulse 1.2s infinite alternate;
+            transform: translate(-50%, -50%) scale(1.15);
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.9), inset 0 2px 6px rgba(255,255,255,0.9);
+            border-color: #00d2ff;
+            background: linear-gradient(135deg, #00d2ff, #005cff);
+            color: #fff;
+            animation: pulseActiveNode 2s infinite;
         }
 
-        @keyframes targetGlowPulse {
-            0% { transform: scale(1.1); box-shadow: 0 0 20px rgba(255, 232, 133, 0.8); }
-            100% { transform: scale(1.25); box-shadow: 0 0 35px rgba(255, 255, 255, 1); }
+        @keyframes pulseActiveNode {
+            0% { box-shadow: 0 0 20px rgba(0, 210, 255, 0.6), inset 0 2px 4px rgba(255,255,255,0.5); }
+            50% { box-shadow: 0 0 40px rgba(0, 210, 255, 1), inset 0 2px 8px rgba(255,255,255,0.9); }
+            100% { box-shadow: 0 0 20px rgba(0, 210, 255, 0.6), inset 0 2px 4px rgba(255,255,255,0.5); }
         }
 
         .active-node-pointer {
             position: absolute;
-            top: -24px;
+            top: -32px;
             left: 50%;
             transform: translateX(-50%);
-            background: linear-gradient(180deg, #ffe885, #d49b13);
-            border: 1.5px solid #ffffff;
-            color: #1a0f00;
-            font-size: 9px;
+            background: rgba(0, 210, 255, 0.95);
+            color: #fff;
+            font-size: 10px;
             font-weight: 900;
-            padding: 2px 6px;
-            border-radius: 8px;
+            padding: 5px 10px;
+            border-radius: 12px;
+            border: 1.5px solid #fff;
             white-space: nowrap;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.6);
-            animation: bouncePointer 1s infinite alternate;
-            z-index: 30;
+            box-shadow: 0 4px 12px rgba(0, 210, 255, 0.6);
+            pointer-events: none;
+            animation: bouncePointer 1.5s infinite;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
         }
 
         @keyframes bouncePointer {
-            0% { transform: translate(-50%, 0); }
-            100% { transform: translate(-50%, -5px); }
-        }
-
-        @keyframes pulseGlow {
-            0% { transform: scale(1); box-shadow: 0 0 15px rgba(245, 197, 66, 0.8); }
-            100% { transform: scale(1.1); box-shadow: 0 0 25px rgba(255, 224, 102, 1); }
-        }
-
-        .map-node.boss {
-            border-color: #ff4757;
-            background: radial-gradient(circle, #ff6b81, #c0392b);
-            color: #fff;
+            0%, 100% { transform: translate(-50%, 0); }
+            50% { transform: translate(-50%, -6px); }
         }
 
         .node-stars {
             position: absolute;
-            bottom: -10px;
-            font-size: 9px;
+            bottom: -16px;
+            font-size: 11px;
+            letter-spacing: -2px;
+            text-shadow: 0 1px 2px #000;
+            white-space: nowrap;
         }
 
-        /* WOODEN TEXTURED STAGE CARDS */
+        /* STAGE LIST AREA - SLEEK MYTHIC GLASS TABLET CARDS */
         .stage-list-area {
-            padding: 85px 12px 100px;
+            padding: 15px 14px 100px;
             display: none;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
+            max-width: 440px;
+            margin: 0 auto;
+            width: 100%;
         }
 
         .stage-list-area.active {
@@ -587,57 +709,87 @@
 
         .wood-stage-card {
             position: relative;
-            background: linear-gradient(135deg, #3d2314 0%, #1f1109 100%);
-            border: 2px solid var(--gold-dark);
-            border-radius: 16px;
-            padding: 12px 15px;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 6px 15px rgba(0,0,0,0.6);
+            background: linear-gradient(135deg, rgba(15, 22, 38, 0.92) 0%, rgba(8, 12, 22, 0.96) 100%);
+            backdrop-filter: blur(10px);
+            border: 1.5px solid rgba(245, 197, 66, 0.35);
+            border-radius: 14px;
+            padding: 10px 14px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7), inset 0 1px 2px rgba(255, 255, 255, 0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 10px;
+            transition: transform 0.15s ease, border-color 0.15s ease;
+        }
+
+        .wood-stage-card:active {
+            transform: scale(0.98);
         }
 
         .wood-stage-card.boss {
             border-color: #ff4757;
-            background: linear-gradient(135deg, #4a141a 0%, #20080b 100%);
+            background: linear-gradient(135deg, rgba(40, 15, 20, 0.92) 0%, rgba(20, 8, 10, 0.96) 100%);
+            box-shadow: 0 0 15px rgba(255, 71, 87, 0.25), 0 4px 15px rgba(0, 0, 0, 0.7);
         }
 
         .wood-card-info {
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            gap: 4px;
+            flex: 1;
+            min-width: 0;
         }
 
         .wood-card-title {
-            font-size: 15px;
+            font-size: 13px;
             font-weight: 900;
             color: var(--gold-light);
             display: flex;
             align-items: center;
             gap: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .wood-card-desc {
+        .wood-card-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             font-size: 11px;
-            color: #aaa;
         }
+
+        .wood-card-info-row {
+            color: #94a3b8;
+            font-weight: 700;
+        }
+
+        .wood-card-status {
+            font-weight: 800;
+            font-size: 11px;
+        }
+        .wood-card-status.completed { color: #f5c542; }
+        .wood-card-status.unlocked { color: #2ecc71; }
+        .wood-card-status.locked { color: #94a3b8; }
 
         .wood-card-btn {
             padding: 8px 16px;
-            background: linear-gradient(180deg, #2ecc71, #27ae60);
-            border: 1px solid #fff;
-            border-radius: 12px;
-            color: #fff;
+            background: linear-gradient(180deg, #ffe885 0%, #d49b13 100%);
+            border: 1.5px solid #ffffff;
+            border-radius: 18px;
+            color: #1a0800;
             font-size: 12px;
             font-weight: 900;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.4);
+            box-shadow: 0 0 12px rgba(245, 197, 66, 0.5);
+            white-space: nowrap;
+            transition: all 0.15s ease;
         }
 
         .wood-card-btn.locked {
-            background: #333;
-            border-color: #555;
-            color: #888;
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(148, 163, 184, 0.3);
+            color: #64748b;
             cursor: not-allowed;
             box-shadow: none;
         }
@@ -894,25 +1046,73 @@
         }
 
         .gameplay-hud {
-            padding-top: 40px;
-            padding-left: 15px;
-            padding-right: 15px;
+            padding-top: 30px;
+            padding-left: 10px;
+            padding-right: 10px;
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            max-width: 440px;
+            margin: 0 auto;
+            box-sizing: border-box;
         }
 
         .stat-box-game {
             background: rgba(0,0,0,0.85);
             border: 1.5px solid var(--gold-primary);
             border-radius: 12px;
-            padding: 6px 14px;
+            padding: 4px 8px;
             text-align: center;
             box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+            min-width: 62px;
         }
 
-        .stat-lbl { font-size: 10px; color: #aaa; font-weight: 700; }
-        .stat-num { font-size: 20px; font-weight: 900; color: var(--gold-light); }
+        .stat-lbl { font-size: 9px; color: #aaa; font-weight: 700; }
+        .stat-num { font-size: 16px; font-weight: 900; color: var(--gold-light); }
+
+        .star-progress-bar-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 190px;
+            height: 12px;
+            background: rgba(10, 15, 25, 0.95);
+            border: 1.5px solid var(--gold-primary);
+            border-radius: 10px;
+            overflow: visible;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 0 10px rgba(245,197,66,0.3);
+            margin-top: 4px;
+        }
+
+        .star-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff8c00 0%, #ffe885 50%, #f5c542 100%);
+            border-radius: 8px;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 8px rgba(255,232,133,0.8);
+        }
+
+        .star-marker {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 13px;
+            filter: grayscale(100%) opacity(0.3);
+            transition: all 0.3s ease;
+            z-index: 5;
+        }
+
+        .star-marker.active {
+            filter: grayscale(0%) opacity(1);
+            transform: translate(-50%, -50%) scale(1.35);
+            text-shadow: 0 0 12px #ffe885;
+        }
+
+        .star-marker-1 { left: 50%; }
+        .star-marker-2 { left: 75%; }
+        .star-marker-3 { left: 98%; }
 
         .grid-area-wrapper {
             position: relative;
@@ -921,8 +1121,8 @@
 
         .grid-container {
             display: grid;
-            grid-template-columns: repeat(8, 42px);
-            grid-template-rows: repeat(8, 42px);
+            grid-template-columns: repeat(8, 46px);
+            grid-template-rows: repeat(8, 46px);
             gap: 4px;
             background: rgba(10, 15, 26, 0.94);
             border: 3px solid var(--gold-primary);
@@ -930,16 +1130,17 @@
             padding: 6px;
             box-shadow: 0 0 35px rgba(0,210,255,0.3);
             position: relative;
+            margin: 0 auto;
         }
 
         .cell {
-            width: 42px;
-            height: 42px;
+            width: 46px;
+            height: 46px;
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
+            font-size: 26px;
             cursor: pointer;
             touch-action: none;
             user-select: none;
@@ -1034,39 +1235,85 @@
         }
 
         .gameplay-god-summons {
-            padding: 0 15px;
+            max-width: 440px;
+            width: 100%;
+            margin: 6px auto;
+            padding: 6px 12px;
             display: flex;
-            gap: 8px;
+            gap: 10px;
             justify-content: center;
+            background: rgba(10, 14, 26, 0.65);
+            border-radius: 18px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            box-sizing: border-box;
+            backdrop-filter: blur(8px);
         }
 
         .god-summon-btn {
             flex: 1;
-            background: rgba(0,0,0,0.85);
+            background: linear-gradient(135deg, rgba(28, 22, 10, 0.95), rgba(12, 9, 4, 0.95));
             border: 1.5px solid var(--gold-primary);
-            border-radius: 12px;
-            padding: 8px;
+            border-radius: 20px;
+            padding: 6px 12px;
             color: #fff;
             font-size: 11px;
             font-weight: 800;
             cursor: pointer;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .god-summon-btn:not(:disabled) {
-            animation: godReadyGlow 1.2s infinite alternate;
+        .god-summon-btn#btn-powerup-athena {
+            background: linear-gradient(135deg, rgba(10, 24, 34, 0.95), rgba(4, 10, 16, 0.95));
+            border-color: #00e5ff;
         }
 
-        @keyframes godReadyGlow {
-            0% { border-color: var(--gold-primary); box-shadow: 0 0 10px rgba(245, 197, 66, 0.6); }
-            100% { border-color: #fff; box-shadow: 0 0 20px rgba(255, 232, 133, 1); }
+        .god-summon-btn.glow {
+            animation: boosterReadyPulse 1.6s infinite ease-in-out;
+        }
+
+        @keyframes boosterReadyPulse {
+            0% { box-shadow: 0 0 6px rgba(255, 215, 0, 0.4), inset 0 0 4px rgba(255, 215, 0, 0.2); }
+            50% { box-shadow: 0 0 16px rgba(255, 215, 0, 0.8), inset 0 0 10px rgba(255, 215, 0, 0.4); transform: scale(1.02); }
+            100% { box-shadow: 0 0 6px rgba(255, 215, 0, 0.4), inset 0 0 4px rgba(255, 215, 0, 0.2); }
+        }
+
+        .god-summon-btn#btn-powerup-athena.glow {
+            animation: boosterAthenaPulse 1.6s infinite ease-in-out;
+        }
+
+        @keyframes boosterAthenaPulse {
+            0% { box-shadow: 0 0 6px rgba(0, 229, 255, 0.4), inset 0 0 4px rgba(0, 229, 255, 0.2); }
+            50% { box-shadow: 0 0 16px rgba(0, 229, 255, 0.8), inset 0 0 10px rgba(0, 229, 255, 0.4); transform: scale(1.02); }
+            100% { box-shadow: 0 0 6px rgba(0, 229, 255, 0.4), inset 0 0 4px rgba(0, 229, 255, 0.2); }
         }
 
         .god-summon-btn:disabled {
-            opacity: 0.4;
-            filter: grayscale(1);
-            cursor: not-allowed;
+            opacity: 0.5;
+            filter: grayscale(0.7);
+            cursor: pointer;
+            animation: none !important;
+        }
+
+        .booster-badge-count {
+            background: #27ae60;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 900;
+            padding: 2px 8px;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.3);
+            transition: all 0.2s ease;
+        }
+
+        .booster-badge-count.empty {
+            background: rgba(231, 76, 60, 0.8);
         }
 
         .gameplay-bottom {
@@ -1101,6 +1348,55 @@
             filter: grayscale(1);
             opacity: 0.5;
         }
+
+        /* Modal Base overrides for Animation */
+        .modal-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-card {
+            width: 90%;
+            max-width: 400px;
+            padding: 20px;
+            box-sizing: border-box;
+            background: linear-gradient(180deg, #1e1e1e 0%, #111 100%);
+            border: 2px solid var(--gold-dark);
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            text-align: center;
+            position: relative;
+            transform: scale(0.8);
+            opacity: 0;
+        }
+        .modal-overlay.active .modal-card {
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .star-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            height: 40px;
+        }
+        .victory-star {
+            font-size: 30px;
+            color: #444;
+            transition: color 0.3s;
+        }
+        .victory-star.active {
+            color: #f5c542;
+            text-shadow: 0 0 15px #f5c542;
+            animation: starDrop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
     </style>
 
     <!-- Firebase SDK (Compat Version for simple integration) -->
@@ -1121,6 +1417,7 @@
 
         <!-- App Viewport -->
         <div class="app-viewport">
+            <div id="toast-container"></div>
             
             <!-- Global Top HUD -->
             <div class="top-hud" id="global-hud" style="display: flex;">
@@ -1135,7 +1432,10 @@
                 <button class="btn-header-home" onclick="showScreen('screen-mainmenu')">🏛️ ANA MENÜ</button>
 
                 <div class="hud-currencies">
-                    <div class="currency-badge" >⚡ <span id="hud-energy">5/5</span></div>
+                    <div class="currency-badge" style="display: flex; flex-direction: column; align-items: center; line-height: 1;">
+                        <div>⚡ <span id="hud-energy">5/5</span></div>
+                        <div id="hud-energy-timer" style="font-size: 8px; color: #aaa; margin-top: 2px;">DOLU</div>
+                    </div>
                     <div class="currency-badge" >🪙 <span id="hud-gold">1.0K</span></div>
                 </div>
             </div>
@@ -1158,6 +1458,27 @@
                     <span class="nav-icon">🏆</span>
                     <span>LİG</span>
                 </div>
+                <div class="nav-item" onclick="openStoreScreen()">
+                    <span class="nav-icon">💎</span>
+                    <span>HAZİNE</span>
+                </div>
+            </div>
+
+            <!-- SCREEN WIPE FADER -->
+            <div class="screen-wipe" id="screen-wipe"></div>
+
+            <!-- MODAL: ONBOARDING TUTORIAL -->
+            <div class="modal-overlay" id="modal-onboarding">
+                <div class="modal-card" style="padding: 25px 20px;">
+                    <div style="font-size: 50px; margin-bottom: 10px;">✨</div>
+                    <div class="modal-title" style="color: var(--gold-light);">ARKENYA'YA HOŞ GELDİNİZ!</div>
+                    <div style="font-size: 13px; color: #ccc; line-height: 1.5; margin-bottom: 20px; text-align: left;">
+                        <b style="color: #fff;">1.</b> Aynı renkteki 3 veya daha fazla taşı birleştirerek patlatın.<br><br>
+                        <b style="color: #fff;">2.</b> Hamle sayınız bitmeden hedef puana ulaşmanız gerekir.<br><br>
+                        <b style="color: #fff;">3.</b> Puan kazandıkça Kahraman Yeteneği dolar, dolduğunda <b>YETENEK KULLAN</b> butonuna basarak gücünüzü açığa çıkarın!
+                    </div>
+                    <button class="btn-action btn-action-green" style="height: 50px; font-size: 16px;" onclick="closeModal('modal-onboarding')">MACERAYA BAŞLA!</button>
+                </div>
             </div>
 
             <!-- SCREEN 1: SPLASH -->
@@ -1175,8 +1496,7 @@
             <!-- SCREEN 2: MAIN MENU (DIRECT OYUNA BAŞLA + HARİTA) -->
             <div class="screen active" id="screen-mainmenu">
                 <div class="menu-center-hero">
-                    <button class="mythic-btn-gold" onclick="openWorldMap()">⚡ OYUNA BAŞLA</button>
-                    <!-- <button class="mythic-btn-sub" onclick="openWorldMap()">🗺️ DÜNYA HARİTASI (50 BÖLÜM)</button> -->
+                    <button class="mythic-btn-gold" onclick="startGameplay()">⚡ OYUNA BAŞLA</button>
                     <button class="mythic-btn-sub" style="border-color: #475569; color: #94a3b8;" onclick="openHeroScreen()">🛡️ KAHRAMAN DEĞİŞTİR</button>
                     <button class="reset-btn-link" onclick="resetProgressToFresh()">🔄 Oyunu Sıfırla (Bölüm 1'den Başlat)</button>
                 </div>
@@ -1205,6 +1525,10 @@
             <!-- SCREEN 4: HERO SELECTION WITH HERO UNLOCKING PROGRESSION -->
             <div class="screen" id="screen-hero">
                 <div class="hero-tabs">
+                    <div class="hero-tab-btn" id="tab-arkenya" onclick="viewHeroTab('arkenya')">
+                        <div class="tab-avatar-mini" style="background-image: url('Assets/Art/hero_arkenya.jpg');"></div>
+                        <span>ARKENYA</span>
+                    </div>
                     <div class="hero-tab-btn active" id="tab-asterion" onclick="viewHeroTab('asterion')">
                         <div class="tab-avatar-mini" style="background-image: url('Assets/Art/hero_asterion_1789032622044.png');"></div>
                         <span>ASTERION</span>
@@ -1249,24 +1573,127 @@
                         <div id="hero-display-desc">Öfke patlaması ile tahtadaki 3x3 alanı patlatır.</div>
                     </div>
 
-                    <button class="mythic-btn-sub" style="margin-bottom: 6px; height: 38px;" id="btn-upgrade-hero" onclick="upgradeSelectedHero()">SEVİYE YÜKSELT (1,000 🪙)</button>
-                    <button class="mythic-btn-green" id="btn-confirm-hero" onclick="confirmHeroAndGoToMap()">KAHRAMANI SEÇ VE HARİTAYA GİT ➔</button>
+                    <button class="mythic-btn-sub" style="margin-bottom: 2px; height: 38px;" id="btn-upgrade-hero" onclick="upgradeSelectedHero()">SEVİYE YÜKSELT (1,000 🪙)</button>
+                    <div style="font-size: 9.5px; color: #64748b; text-align: center; margin-bottom: 8px; line-height: 1.2;">* Seviye yükseltmek, oyundaki puan çarpanınızı (HP) ve<br>özel yetenek gücünüzü (ATK) kalıcı olarak artırır.</div>
+                    <button class="mythic-btn-gold" style="height: 48px; font-size: 14px;" id="btn-confirm-hero" onclick="confirmHeroAndGoToMap()">KAHRAMANI SEÇ VE HARİTAYA GİT ➔</button>
                     <button class="mythic-btn-sub" style="border-color: #475569; color: #94a3b8; height: 38px; font-size: 12px; margin-top: 6px;" onclick="showScreen('screen-mainmenu')">🏛️ ANA MENÜYE DÖN</button>
                 </div>
             </div>
 
-            <!-- SCREEN 5: GAMEPLAY WITH CANDY CRUSH & ZEUS EXPLOSIONS -->
+            <!-- SCREEN: STORE (Zeus'un Kutsal Hazinesi) -->
+            <div class="screen" id="screen-store" style="background: url('hero_arkenya.jpg') center/cover; position: relative;">
+                <style>#screen-store-scroll::-webkit-scrollbar { display: none; } #screen-store-scroll { -ms-overflow-style: none; scrollbar-width: none; }</style>
+                <div style="position: absolute; top:0;left:0;width:100%;height:100%;background: rgba(0,0,0,0.85);"></div>
+                <div id="screen-store-scroll" style="position: relative; z-index: 10; padding: 20px; height: calc(100vh - 60px); overflow-y: scroll; padding-bottom: 250px; -webkit-overflow-scrolling: touch;">
+                    <div style="font-size: 24px; font-weight: bold; color: var(--gold-light); text-align: center; margin-bottom: 5px;">ZEUS'UN KUTSAL HAZİNESİ</div>
+                    <div style="font-size: 13px; color: #ccc; text-align: center; margin-bottom: 20px; font-style: italic;">Tanrıların lütufları ve eşsiz güçler...</div>
+                    
+                    <div style="display: flex; gap: 15px; margin-bottom: 25px;">
+                        <div style="flex: 1; text-align: center; background: rgba(212,155,19,0.15); border: 1px solid rgba(212,155,19,0.3); border-radius: 12px; padding: 15px;">
+                            <div style="font-size: 11px; font-weight: bold; color: var(--gold-light); margin-bottom: 5px;">ALTIN</div>
+                            <div style="font-size: 20px; font-weight: bold; color: var(--gold-primary);">💰 <span id="store-screen-gold">0</span></div>
+                        </div>
+                        <div style="flex: 1; text-align: center; background: rgba(0,210,255,0.15); border: 1px solid rgba(0,210,255,0.3); border-radius: 12px; padding: 15px;">
+                            <div style="font-size: 11px; font-weight: bold; color: var(--accent-blue); margin-bottom: 5px;">ELMAS</div>
+                            <div style="font-size: 20px; font-weight: bold; color: #00d2ff;">💎 <span id="store-screen-gems">0</span></div>
+                        </div>
+                    </div>
+
+                    <div style="font-size: 16px; font-weight: bold; color: #fff; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px;">Tapınak Pazarı</div>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 30px;">
+                        
+                        <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 15px; display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <div style="font-weight: bold; font-size: 14px; color: #fff;">⚡ Zeus'un Şimşeği</div>
+                                <div style="font-size: 11px; color: #aaa; margin-top: 3px;">Oyun içinde rastgele 5 taşı yok eder.</div>
+                                <div style="font-size: 11px; color: var(--accent-blue); margin-top: 3px;">Sahip Olunan: <span id="store-screen-inv-zeus">0</span></div>
+                            </div>
+                            <button class="btn-action" style="width: auto; padding: 0 15px; height: 38px; font-size: 13px; background: linear-gradient(180deg, #d49b13 0%, #a6790e 100%);" onclick="buyItem('zeus', 250, 'gold')">250 💰</button>
+                        </div>
+
+                        <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 15px; display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <div style="font-weight: bold; font-size: 14px; color: #fff;">🛡️ Athena'nın Lütfu</div>
+                                <div style="font-size: 11px; color: #aaa; margin-top: 3px;">Oyun içi kullanımda anında +5 hamle verir.</div>
+                                <div style="font-size: 11px; color: var(--accent-blue); margin-top: 3px;">Sahip Olunan: <span id="store-screen-inv-athena">0</span></div>
+                            </div>
+                            <button class="btn-action" style="width: auto; padding: 0 15px; height: 38px; font-size: 13px; background: linear-gradient(180deg, #d49b13 0%, #a6790e 100%);" onclick="buyItem('athena', 500, 'gold')">500 💰</button>
+                        </div>
+
+                        <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 15px; display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <div style="font-weight: bold; font-size: 14px; color: #fff;">🧪 Nektar İksiri</div>
+                                <div style="font-size: 11px; color: #aaa; margin-top: 3px;">Tüm canları (enerji) anında doldurur.</div>
+                            </div>
+                            <button class="btn-action" style="width: auto; padding: 0 15px; height: 38px; font-size: 13px; background: linear-gradient(180deg, #00d2ff 0%, #0088ff 100%);" onclick="buyItem('energy', 10, 'gems')">10 💎</button>
+                        </div>
+                    </div>
+
+                    <div style="font-size: 16px; font-weight: bold; color: #fff; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px;">Kutsal Paketler</div>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
+                        
+                        <div style="background: linear-gradient(135deg, rgba(255,215,0,0.15) 0%, rgba(218,165,32,0.05) 100%); border: 1px solid var(--gold-primary); border-radius: 12px; padding: 15px; display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <div style="font-weight: 800; font-size: 15px; color: var(--gold-primary);">🎁 Zeus'un Bereket Paketi</div>
+                                <div style="font-size: 12px; color: #ddd; margin-top: 5px;">15,000 💰 + 250 💎</div>
+                                <div style="font-size: 10px; color: #aaa; margin-top: 2px;">En iyi başlangıç!</div>
+                            </div>
+                            <button class="btn-action" style="width: auto; padding: 0 20px; height: 40px; font-size: 14px; background: #fff; color: #000;" onclick="purchaseIAP('zeus_bundle', 34.99, '15,000 Altın + 250 Elmas')">₺34.99</button>
+                        </div>
+
+                        <div style="background: linear-gradient(135deg, rgba(255,0,0,0.15) 0%, rgba(139,0,0,0.05) 100%); border: 1px solid #ff4444; border-radius: 12px; padding: 15px; display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <div style="font-weight: 800; font-size: 15px; color: #ff6666;">⚔️ Ares'in Öfke Paketi</div>
+                                <div style="font-size: 12px; color: #ddd; margin-top: 5px;">25x ⚡ Şimşek + 25x 🛡️ Lütuf</div>
+                                <div style="font-size: 10px; color: #aaa; margin-top: 2px;">Savaşta sınır tanıma.</div>
+                            </div>
+                            <button class="btn-action" style="width: auto; padding: 0 20px; height: 40px; font-size: 14px; background: #fff; color: #000;" onclick="purchaseIAP('ares_bundle', 89.99, '25x Zeus Şimşek + 25x Athena Lütuf')">₺89.99</button>
+                        </div>
+
+                        <div style="background: linear-gradient(135deg, rgba(0,191,255,0.15) 0%, rgba(0,0,139,0.05) 100%); border: 1px solid #00bfff; border-radius: 12px; padding: 15px; display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <div style="font-weight: 800; font-size: 15px; color: #66ccff;">🌊 Poseidon'un İksir Çantası</div>
+                                <div style="font-size: 12px; color: #ddd; margin-top: 5px;">30x 🧪 Nektar İksiri</div>
+                                <div style="font-size: 10px; color: #aaa; margin-top: 2px;">Maceran hiç bitmesin.</div>
+                            </div>
+                            <button class="btn-action" style="width: auto; padding: 0 20px; height: 40px; font-size: 14px; background: #fff; color: #000;" onclick="purchaseIAP('poseidon_bundle', 19.99, '30x Nektar İksiri (Can)')">₺19.99</button>
+                        </div>
+                    </div>
+                </div>       <button class="btn-action" style="width: auto; padding: 0 15px; height: 38px; font-size: 13px; background: linear-gradient(180deg, #00d2ff 0%, #0088ff 100%);" onclick="buyItem('energy', 10, 'gems')">10 💎</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
             <div class="screen" id="screen-gameplay">
                 <div class="gameplay-hud">
                     <div class="stat-box-game">
-                        <div class="stat-lbl">HAMLE</div>
+                        <div class="stat-lbl" id="game-moves-lbl">HAMLE</div>
                         <div class="stat-num" id="game-moves">25</div>
                     </div>
+
+                    <!-- Live Star Progress Bar & Energy Badge -->
+                    <div style="flex: 1; margin: 0 6px; display: flex; flex-direction: column; align-items: center;">
+                        <div style="display: flex; gap: 6px; align-items: center; font-size: 10px; font-weight: 800; background: rgba(0,0,0,0.7); padding: 2px 8px; border-radius: 12px; border: 1px solid var(--gold-dark);">
+                            <span style="color: #ff5555;">⚡ <span id="game-energy-val">5</span>/5</span>
+                            <span style="color: #aaa; font-size: 9px;" id="hud-game-energy-timer">DOLU</span>
+                        </div>
+
+                        <!-- Star Progress Bar -->
+                        <div class="star-progress-bar-wrapper">
+                            <div class="star-progress-fill" id="game-star-progress-fill"></div>
+                            <div class="star-marker star-marker-1" id="hud-star-1">⭐</div>
+                            <div class="star-marker star-marker-2" id="hud-star-2">⭐</div>
+                            <div class="star-marker star-marker-3" id="hud-star-3">⭐</div>
+                        </div>
+                    </div>
+
                     <div class="stat-box-game">
                         <div class="stat-lbl" id="game-level-lbl">BÖLÜM 1</div>
                         <div class="stat-num" id="game-score">0</div>
                     </div>
-                    <button class="btn-header-home" style="margin-top: 5px;" onclick="showScreen('screen-mainmenu')">⬅️ ANA MENÜ</button>
+                    <button class="btn-header-home" style="padding: 6px 10px; font-size: 13px;" onclick="openModal('modal-pause')">⏸️</button>
                 </div>
 
                 <div class="grid-area-wrapper">
@@ -1276,9 +1703,14 @@
 
                 <!-- DIVINE GOD SUMMON BUTTONS -->
                 <div class="gameplay-god-summons">
-                    <button class="god-summon-btn" id="btn-summon-zeus" disabled onclick="summonGod('zeus')">⚡ ZEUS<br><small style="font-size:8px;">+5,000 Puan</small></button>
-                    <button class="god-summon-btn" id="btn-summon-poseidon" disabled onclick="summonGod('poseidon')">🔱 POSEIDON<br><small style="font-size:8px;">+2 Ek Can</small></button>
-                    <button class="god-summon-btn" id="btn-summon-athena" disabled onclick="summonGod('athena')">🛡️ ATHENA<br><small style="font-size:8px;">+10 Hamle</small></button>
+                    <button class="god-summon-btn" id="btn-powerup-zeus" onclick="usePowerup('zeus')">
+                        <span>⚡ ZEUS</span>
+                        <span class="booster-badge-count" id="lbl-powerup-zeus">2x</span>
+                    </button>
+                    <button class="god-summon-btn" id="btn-powerup-athena" onclick="usePowerup('athena')">
+                        <span>🛡️ ATHENA</span>
+                        <span class="booster-badge-count" id="lbl-powerup-athena">2x</span>
+                    </button>
                 </div>
 
                 <!-- Bottom Gameplay Bar -->
@@ -1294,16 +1726,28 @@
                 </div>
             </div>
 
+            <!-- MODAL: PAUSE -->
+            <div class="modal-overlay" id="modal-pause">
+                <div class="modal-card" style="width: 90%; max-width: 380px; padding: 22px; box-sizing: border-box; text-align: center;">
+                    <div style="font-size: 45px; margin-bottom: 8px;">⏸️</div>
+                    <div class="modal-title" style="color: var(--gold-light); font-size: 18px; margin-bottom: 15px;">OYUN DURAKLATILDI</div>
+                    
+                    <button class="btn-action btn-action-green" style="height: 48px; font-size: 15px; margin-bottom: 10px;" onclick="closeModal('modal-pause')">▶️ OYUNA DEVAM ET</button>
+                    <button class="btn-action" style="height: 42px; font-size: 13px; margin-bottom: 10px; background: rgba(245,197,66,0.2); border: 1px solid var(--gold-primary); color: var(--gold-light);" onclick="restartFromPause()">🔄 TEKRAR BAŞLAT (-1 Can)</button>
+                    <button class="btn-action" style="height: 40px; font-size: 13px; background: #333; color: #fff;" onclick="closeModal('modal-pause'); showScreen('screen-mainmenu');">🗺️ ANA MENÜYE DÖN</button>
+                </div>
+            </div>
+
             <!-- MODAL: LEVEL PREVIEW (EXPLICIT OYUNA BAŞLA BUTTON & TUTORIAL) -->
             <div class="modal-overlay" id="modal-level-preview">
-                <div class="modal-card">
+                <div class="modal-card" style="width: 90%; max-width: 400px; padding: 20px; box-sizing: border-box;">
                     <div class="modal-close" onclick="closeModal('modal-level-preview')">✕</div>
                     <div class="modal-title" id="preview-title" style="font-size: 16px;">BÖLÜM 1</div>
                     <div id="preview-story" style="font-size: 12px; color: var(--gold-light); margin-bottom: 12px; font-style: italic; line-height: 1.4;">"Hikaye burada yer alacak..."</div>
                     
-                    <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; margin-bottom: 15px; text-align: left; width: 100%;">
-                        <div style="font-size: 11px; font-weight: 800; color: #fff; margin-bottom: 4px;">🎮 NASIL OYNANIR?</div>
-                        <div style="font-size: 10px; color: #ccc; line-height: 1.4;">
+                    <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 10px; margin: 0 4px 15px 4px; text-align: left; box-sizing: border-box;">
+                        <div style="font-size: 10px; font-weight: 800; color: #fff; margin-bottom: 3px;">🎮 NASIL OYNANIR?</div>
+                        <div style="font-size: 9px; color: #ccc; line-height: 1.3;">
                             Aynı renkteki <b>en az 3 taşı</b> yan yana veya üst üste getirerek patlatın. Her patlatma puan kazandırır. Hamleleriniz bitmeden hedef puana ulaşmalısınız!
                         </div>
                     </div>
@@ -1320,12 +1764,27 @@
 
             <!-- MODAL: VICTORY -->
             <div class="modal-overlay" id="modal-victory">
-                <div class="modal-card">
+                <div class="modal-card" style="width: 90%; max-width: 400px; padding: 20px; box-sizing: border-box;">
                     <div style="font-size: 50px;">🏆</div>
                     <div class="modal-title" style="color: var(--gold-light);">BÖLÜM GEÇİLDİ!</div>
-                    <div style="font-size: 20px; margin-bottom: 10px;">⭐ ⭐ ⭐</div>
-                    <div style="font-size: 14px; margin-bottom: 15px;">Skor: <b id="victory-score">3,450</b></div>
-                    <div style="font-size: 12px; color: var(--accent-green); margin-bottom: 10px;">+250 Altın | +15 Elmas Kazanıldı!</div>
+                    
+                    <div class="star-container" id="victory-stars-container">
+                        <div class="victory-star" id="v-star-1">⭐</div>
+                        <div class="victory-star" id="v-star-2">⭐</div>
+                        <div class="victory-star" id="v-star-3">⭐</div>
+                    </div>
+
+                    <div style="font-size: 14px; margin-bottom: 10px;">Skor: <b id="victory-score">0</b></div>
+                    <div style="display: flex; justify-content: space-around; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+                        <div>
+                            <div style="font-size: 10px; color: var(--gold-light);">Kazanılan Altın</div>
+                            <div style="font-size: 18px; font-weight: bold; color: var(--gold-primary);">💰 <span id="victory-gold">0</span></div>
+                        </div>
+                        <div>
+                            <div style="font-size: 10px; color: var(--accent-blue);">Kazanılan Elmas</div>
+                            <div style="font-size: 18px; font-weight: bold; color: #00d2ff;">💎 <span id="victory-gems">0</span></div>
+                        </div>
+                    </div>
                     <div style="font-size: 11px; color: var(--accent-blue); font-weight: 700; margin-bottom: 15px;" id="unlock-hero-notify">🔓 SONRAKİ BÖLÜMÜN KİLİDİ AÇILDI!</div>
                     <button class="btn-action btn-action-green" style="height: 50px; font-size: 15px; margin-bottom: 8px;" onclick="playNextLevelDirectly()">⚡ SONRAKİ BÖLÜME GEÇ (Bölüm <span id="next-lvl-num-btn">2</span>) ➔</button>
                     <button class="btn-action" style="background: #333; color: #fff; height: 38px;" onclick="nextLevelAndUnlock()">🗺️ HARİTAYA DÖN</button>
@@ -1336,29 +1795,197 @@
             <div class="modal-overlay" id="modal-defeat">
                 <div class="modal-card">
                     <div style="font-size: 50px;">💔</div>
-                    <div class="modal-title" style="color: var(--accent-red);">HAMLE BİTTİ!</div>
-                    <div style="font-size: 13px; color: #aaa; margin-bottom: 15px;">Hedef puana ulaşılamadı. Ek süre veya yeni hak ile tekrar deneyin!</div>
-                    <button class="btn-action btn-action-green" style="height: 48px; font-size: 14px; margin-bottom: 8px;" onclick="restartCurrentLevel()">🔄 BÖLÜMÜ YENİDEN BAŞLAT</button>
+                    <div class="modal-title" style="color: var(--accent-red);">BÖLÜM KAYBEDİLDİ</div>
+                    <div style="font-size: 13px; color: #aaa; margin-bottom: 15px;">Hedef puana ulaşılamadı. Bir canını (⚡) kaybettin.</div>
+                    <button class="btn-action btn-action-green" style="height: 48px; font-size: 14px; margin-bottom: 8px;" onclick="restartCurrentLevel()">🔄 TEKRAR DENE (⚡ 1 Can)</button>
                     <button class="btn-action" style="background: #333; color: #fff; height: 38px;" onclick="closeModal('modal-defeat'); openWorldMap();">🗺️ HARİTAYA DÖN</button>
+                </div>
+            </div>
+
+            <!-- MODAL: IAP PAYMENT SIMULATION -->
+            <div class="modal-overlay" id="modal-payment">
+                <div class="modal-card" style="background: #fff; color: #000; border-radius: 16px; padding: 25px 20px;">
+                    <div style="font-size: 18px; font-weight: bold; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
+                        <span>App Store Onayı</span>
+                        <span style="font-size: 24px;" onclick="closeModal('modal-payment')">✕</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                        <div style="font-size: 40px; background: #f0f0f0; border-radius: 12px; padding: 10px;">💎</div>
+                        <div style="text-align: left;">
+                            <div style="font-size: 14px; font-weight: bold;" id="payment-item-name">Öğe Adı</div>
+                            <div style="font-size: 12px; color: #666;">Arkenya: Mythic Jewels</div>
+                        </div>
+                    </div>
+                    
+                    <div style="font-size: 28px; font-weight: bold; margin-bottom: 20px;" id="payment-price">₺0.00</div>
+                    
+                    <div style="font-size: 12px; color: #888; margin-bottom: 25px; line-height: 1.4;">Ödemeniz kayıtlı kartınız üzerinden gerçekleştirilecektir. İptal etmek için çarpıya basabilirsiniz.</div>
+                    
+                    <button class="btn-action" style="background: #007aff; color: #fff; height: 50px; font-size: 16px; font-weight: bold; border-radius: 25px;" id="btn-confirm-payment">Satın Al (Face ID)</button>
+                </div>
+            </div>
+
+            <!-- MODAL: DAILY REWARD -->
+            <div class="modal-overlay" id="modal-daily-reward">
+                <div class="modal-card" style="max-height: 80vh; overflow-y: auto; width: 90%; max-width: 400px; padding: 20px;">
+                    <div class="modal-title" style="margin-bottom: 5px;">🎁 OLİMPOS'UN ARMAĞANI</div>
+                    <div style="font-size: 12px; color: var(--gold-primary); margin-bottom: 15px;">GÜNLÜK GİRİŞ ÖDÜLÜ</div>
+                    
+                    <div id="daily-reward-days" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px;">
+                        <!-- JS injected -->
+                    </div>
+
+                    <button class="btn-action" style="background: var(--gold-primary); color: #000; font-weight: bold;" onclick="claimDailyReward()">ÖDÜLÜ AL</button>
+                </div>
+            </div>
+
+            <!-- MODAL: QUESTS -->
+            <div class="modal-overlay" id="modal-quests">
+                <div class="modal-card" style="max-height: 80vh; overflow-y: auto; width: 90%; max-width: 400px; padding: 20px;">
+                    <div class="modal-close" onclick="closeModal('modal-quests')">✕</div>
+                    <div class="modal-title" style="margin-bottom: 5px;">📜 KAHİN'İN KEHANETLERİ</div>
+                    <div style="font-size: 12px; color: var(--gold-primary); margin-bottom: 15px;">GÜNLÜK GÖREVLER</div>
+                    
+                    <div id="quests-list" style="width: 100%; display: flex; flex-direction: column; gap: 10px;">
+                        <!-- Quests will be injected here -->
+                    </div>
+
+                    <button class="btn-action" style="margin-top: 20px; background: #333; color: #fff;" onclick="closeModal('modal-quests')">KAPAT</button>
                 </div>
             </div>
 
             <!-- MODAL: LEADERBOARD -->
             <div class="modal-overlay" id="modal-leaderboard">
-                <div class="modal-card" style="max-height: 80vh; overflow-y: auto;">
+                <div class="modal-card" style="max-height: 80vh; overflow-y: auto; width: 90%; max-width: 400px; padding: 20px;">
                     <div class="modal-close" onclick="closeModal('modal-leaderboard')">✕</div>
-                    <div class="modal-title">🏆 HAFTALIK LİG</div>
-                    <div style="font-size: 12px; color: var(--gold-primary); margin-bottom: 10px;">OLİMPOS LİGİ (TOP 100)</div>
+                    <div class="modal-title" style="margin-bottom: 5px;">🏆 LİG SIRALAMASI</div>
+                    <div style="font-size: 12px; color: var(--gold-primary); margin-bottom: 15px;">OLİMPOS LİGİ (TOP 100)</div>
                     
-                    <div id="leaderboard-list" style="width: 100%; font-size: 12px; text-align: left;">
-                        <!-- Firebase Data Will Load Here -->
+                    <!-- Tabs and Refresh -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <div style="display: flex; gap: 8px;">
+                            <button id="tab-haftalik" class="mythic-btn-sub" style="height: 32px; font-size: 12px; padding: 0 12px; background: var(--gold-primary); color: #000;" onclick="loadLeaderboard('haftalik')">Haftalık</button>
+                            <button id="tab-genel" class="mythic-btn-sub" style="height: 32px; font-size: 12px; padding: 0 12px; border-color: #444; color: #aaa;" onclick="loadLeaderboard('genel')">Genel</button>
+                        </div>
+                        <button class="btn-action" style="height: 32px; padding: 0 12px; font-size: 12px; width: auto; background: linear-gradient(180deg, #00d2ff 0%, #0088ff 100%);" onclick="loadLeaderboard(currentLeaderboardTab, true)">🔄 Yenile</button>
                     </div>
 
-                    <button class="btn-action" style="margin-top: 15px;" onclick="closeModal('modal-leaderboard')">KAPAT</button>
+                    <div id="leaderboard-list" style="width: 100%; font-size: 13px; text-align: left; background: rgba(0,0,0,0.3); border-radius: 8px; padding: 5px;">
+                        <!-- JS generated data -->
+                    </div>
+
+                    <button class="btn-action" style="margin-top: 20px; background: #333; color: #fff;" onclick="closeModal('modal-leaderboard')">KAPAT</button>
                 </div>
             </div>
 
-                    <button class="btn-action" style="margin-top: 15px; background: #333; color: #fff;" onclick="closeModal('modal-shop')">KAPAT</button>
+            <!-- MODAL: SAVE ME (Ek Hamle Teklifi) -->
+            <div class="modal-overlay" id="modal-save-me">
+                <div class="modal-card">
+                    <div style="font-size: 48px;">⚡</div>
+                    <div class="modal-title" style="color: var(--gold-light);">HAMLEN BİTTİ!</div>
+                    <div style="font-size: 13px; color: #ddd; margin-bottom: 15px;">Hedef puana ulaşmak üzeresin! <b>100 Elmas</b> karşılığında <b>+5 Ek Hamle</b> alarak oyuna devam et!</div>
+                    <button class="btn-action btn-action-green" style="height: 48px; font-size: 14px; margin-bottom: 8px;" onclick="buyExtraMoves()">💎 +5 HAMLE AL (100 Elmas)</button>
+                    <button class="btn-action" style="background: #333; color: #fff; height: 38px;" onclick="declineSaveMe()">❌ Vazgeç (Can Kaybet)</button>
+                </div>
+            </div>
+
+            <!-- MODAL: OUT OF LIVES -->
+            <div class="modal-overlay" id="modal-out-of-lives">
+                <div class="modal-card">
+                    <div style="font-size: 48px;">💔</div>
+                    <div class="modal-title" style="color: var(--accent-red);">CANLARIN BİTTİ!</div>
+                    <div style="font-size: 13px; color: #aaa; margin-bottom: 10px;">Yeni can için sayacın dolmasını bekle veya mağazadan canlarını doldur!</div>
+                    <div style="font-size: 22px; font-weight: 800; color: var(--gold-light); margin-bottom: 15px;" id="out-of-lives-timer">30:00</div>
+                    <button class="btn-action btn-action-green" style="height: 48px; font-size: 14px; margin-bottom: 8px;" onclick="buyFullLives()">⚡ TÜM CANLARI DOLDUR (100 Elmas)</button>
+                    <button class="btn-action" style="background: #333; color: #fff; height: 38px;" onclick="closeModal('modal-out-of-lives'); openWorldMap();">🗺️ HARİTAYA DÖN</button>
+                </div>
+            </div>
+
+            <!-- MODAL: FINAL CELEBRATION (Bölüm 50 Tamamlama Ekranı) -->
+            <div class="modal-overlay" id="modal-final-celebration">
+                <div class="modal-card" style="border: 2px solid var(--gold-primary); background: radial-gradient(circle, #1a253a 0%, #080d1a 100%);">
+                    <div style="font-size: 60px; animation: pulse 1.5s infinite alternate;">👑</div>
+                    <div class="modal-title" style="color: var(--gold-light); font-size: 20px;">EFSANEVİ ARKENYA ŞAMPİYONU!</div>
+                    <div style="font-size: 13px; color: #eee; margin: 10px 0; line-height: 1.5;">
+                        Tebrikler kahraman! Olimpos Tanrılarının 50 zorlu sınavını tamamladın ve Arkenya Evrenini kurtardın!
+                    </div>
+                    <div style="font-size: 12px; color: var(--accent-blue); margin-bottom: 15px; font-weight: 700;">
+                        🎖️ TÜM KAHRAMANLAR UNVANI KAZANILDI!
+                    </div>
+                    <button class="btn-action btn-action-green" style="height: 48px; font-size: 14px; margin-bottom: 8px;" onclick="closeModal('modal-final-celebration'); openWorldMap();">🗺️ HARİTAYI KEŞFET</button>
+                    <button class="btn-action" style="background: #e74c3c; color: #fff; height: 38px;" onclick="closeModal('modal-final-celebration'); resetProgressToFresh();">🔄 SIFIRDAN TEKRAR BAŞLA</button>
+                </div>
+            </div>
+
+            <!-- MODAL: SHOP -->
+            <div class="modal-overlay" id="modal-shop">
+                <div class="modal-card" style="max-height: 85vh; overflow-y: auto;">
+                    <div class="modal-close" onclick="closeModal('modal-shop')">✕</div>
+                    <div class="modal-title" style="color: var(--gold-light);">🏛️ ARKENYA HAZİNE MAĞAZASI</div>
+                    <div style="font-size: 12px; color: #aaa; margin-bottom: 15px;">Gücünü artıracak elmas ve altın paketleri:</div>
+
+                    <div style="display: flex; flex-direction: column; gap: 10px; width: 100%; margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(245, 197, 66, 0.3);">
+                            <div>
+                                <div style="font-weight: 700; color: var(--gold-light);">💎 100 Elmas + 1,000 Altın</div>
+                                <div style="font-size: 11px; color: #888;">Başlangıç Destek Paketi</div>
+                            </div>
+                            <button class="btn-action btn-action-green" style="width: auto; padding: 6px 14px; font-size: 12px;" onclick="buyOffer(100, 1000)">19.99 ₺</button>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(245, 197, 66, 0.3);">
+                            <div>
+                                <div style="font-weight: 700; color: var(--gold-light);">💎 500 Elmas + 6,000 Altın</div>
+                                <div style="font-size: 11px; color: #888;">Tanrısal Hazine Paketi</div>
+                            </div>
+                            <button class="btn-action btn-action-green" style="width: auto; padding: 6px 14px; font-size: 12px;" onclick="buyOffer(500, 6000)">79.99 ₺</button>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(245, 197, 66, 0.3);">
+                            <div>
+                                <div style="font-weight: 700; color: var(--gold-light);">💎 1,200 Elmas + 15,000 Altın</div>
+                                <div style="font-size: 11px; color: #888;">Olimpos Efendisi Sandığı</div>
+                            </div>
+                            <button class="btn-action btn-action-green" style="width: auto; padding: 6px 14px; font-size: 12px;" onclick="buyOffer(1200, 15000)">149.99 ₺</button>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(46, 204, 113, 0.3);">
+                            <div>
+                                <div style="font-weight: 700; color: var(--accent-green);">⚡ Canları Tamamen Doldur</div>
+                                <div style="font-size: 11px; color: #888;">Max 5 Can</div>
+                            </div>
+                            <button class="btn-action btn-action-green" style="width: auto; padding: 6px 14px; font-size: 12px;" onclick="buyEnergyFull()">💎 100 Elmas</button>
+                        </div>
+                    </div>
+
+                    <button class="btn-action" style="margin-top: 5px; background: #333; color: #fff;" onclick="closeModal('modal-shop')">KAPAT</button>
+                </div>
+            </div>
+
+            <!-- INTERMISSION OVERLAY SCREEN (Bölüm Arası Ödül & Önizleme Ekranı) -->
+            <div id="intermission-screen" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(4, 6, 10, 0.95); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center;">
+                <div style="font-size: 20px; font-weight: 800; color: var(--gold-light); margin-bottom: 10px;">🎁 BÖLÜM TAMAMLANDI! ÖDÜL SANDIĞI</div>
+                <div id="inter-chest" style="font-size: 70px; cursor: pointer; margin: 15px 0; transition: transform 0.2s;" onclick="openIntermissionChest()">🎁</div>
+                <div id="inter-chest-label" style="font-size: 13px; color: var(--accent-blue); font-weight: 700;">Sandığa Dokun ve Ödülünü Al!</div>
+                
+                <div id="inter-rewards" style="display: none; flex-direction: row; gap: 20px; margin: 15px 0;">
+                    <div style="background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 20px; font-weight: 700; color: var(--gold-primary);">💰 +<span id="inter-gold-reward">0</span> Altın</div>
+                    <div style="background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 20px; font-weight: 700; color: var(--accent-blue);">💎 +<span id="inter-gem-reward">0</span> Elmas</div>
+                </div>
+
+                <div id="inter-next-preview" style="display: none; background: rgba(15, 22, 38, 0.9); padding: 15px; border-radius: 16px; border: 1px solid rgba(245,197,66,0.3); width: 100%; max-width: 320px; margin-bottom: 15px;">
+                    <div id="inter-next-title" style="font-weight: 700; color: var(--gold-light); font-size: 15px; margin-bottom: 5px;">Bölüm 2</div>
+                    <div id="inter-next-desc" style="font-size: 12px; color: #aaa; margin-bottom: 10px;">Bölüm Hedefleri</div>
+                    <div style="display: flex; justify-content: space-around; font-size: 12px;">
+                        <div>🎯 Hedef: <b id="inter-next-target" style="color: var(--gold-primary);">0</b></div>
+                        <div>🦶 Hamle: <b id="inter-next-moves" style="color: var(--accent-blue);">0</b></div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; width: 100%; max-width: 320px;">
+                    <button id="inter-btn-next" class="btn-action btn-action-green" style="display: none; flex: 1; height: 46px;" onclick="goToNextLevelFromIntermission()">⚡ SONRAKİ BÖLÜM ➔</button>
+                    <button class="btn-action" style="flex: 1; height: 46px; background: #333; color: #fff;" onclick="closeIntermissionToMap()">🗺️ HARİTA</button>
                 </div>
             </div>
 
@@ -1389,44 +2016,62 @@
             console.error("Firebase Init Error:", e);
         }
 
-        async function fetchLeaderboard() {
+        let currentLeaderboardTab = 'haftalik';
+
+        async function loadLeaderboard(type = 'haftalik', isRefresh = false) {
+            currentLeaderboardTab = type;
             const listEl = document.getElementById('leaderboard-list');
             if(!listEl) return;
             
-            listEl.innerHTML = '<div style="padding: 10px; text-align:center;">Sunucuya Bağlanıyor...</div>';
+            document.getElementById('tab-haftalik').style.background = type === 'haftalik' ? 'var(--gold-primary)' : 'transparent';
+            document.getElementById('tab-haftalik').style.color = type === 'haftalik' ? '#000' : '#aaa';
+            document.getElementById('tab-haftalik').style.borderColor = type === 'haftalik' ? 'var(--gold-primary)' : '#444';
             
-            try {
-                if(!db) throw new Error("Firebase ayarları eksik.");
-                const snapshot = await db.collection('leaderboard').orderBy('score', 'desc').limit(15).get();
+            document.getElementById('tab-genel').style.background = type === 'genel' ? 'var(--gold-primary)' : 'transparent';
+            document.getElementById('tab-genel').style.color = type === 'genel' ? '#000' : '#aaa';
+            document.getElementById('tab-genel').style.borderColor = type === 'genel' ? 'var(--gold-primary)' : '#444';
+
+            listEl.innerHTML = '<div style="padding: 20px; text-align:center; color: #fff;">Güncelleniyor... 🔄</div>';
+            
+            await new Promise(r => setTimeout(r, 400)); // Simulate network
+
+            let fakeNames = ["ZeusHunter", "Atena23", "TitanSlayer", "OlymposKralı", "HadesGamer", "ArkenyaStar", "MistikOkçu", "Kratos99", "Efsane", "AltınKılıç", "PoseidonSu", "GölgeAdam"];
+            
+            if(isRefresh) fakeNames = fakeNames.sort(() => Math.random() - 0.5);
+
+            let html = `
+                <div style="display: flex; justify-content: space-between; padding: 6px; border-bottom: 1px solid rgba(255,255,255,0.2); font-weight: 700; color: #ccc;">
+                    <span style="width: 30px;">Sıra</span> <span style="flex:1; text-align: left; padding-left: 10px;">Oyuncu</span> <span>Puan</span>
+                </div>
+            `;
+            
+            let baseScore = type === 'genel' ? 850000 : 95000;
+            let userRank = Math.floor(Math.random() * 4) + 3; // 3 to 6
+            
+            for(let i=0; i<10; i++) {
+                let pName = fakeNames[i];
+                let pScore = baseScore - (i * (type === 'genel' ? 45000 : 7500)) + Math.floor(Math.random() * 2000);
                 
-                let html = `
-                    <div style="display: flex; justify-content: space-between; padding: 6px; border-bottom: 1px solid #333; font-weight: 700;">
-                        <span>Sıra</span> <span>Oyuncu</span> <span>Skor</span>
+                let isMe = false;
+                if(i === userRank) {
+                    pName = "Sen (" + (gameState.selectedHero ? gameState.selectedHero.toUpperCase() : "OYUNCU") + ")";
+                    pScore = (gameState.gold * 15) + (type === 'genel' ? 100000 : 0); 
+                    isMe = true;
+                }
+
+                let medal = (i === 0) ? '🥇' : ((i === 1) ? '🥈' : ((i === 2) ? '🥉' : (i + 1)));
+                let bgStyle = isMe ? 'background: rgba(245, 197, 66, 0.2); border-radius: 6px; font-weight: bold; border: 1px solid var(--gold-primary);' : 'border-bottom: 1px solid rgba(255,255,255,0.1);';
+                let colorStyle = isMe ? 'color: #fff;' : 'color: #ddd;';
+                
+                html += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 6px; margin: 2px 0; ${bgStyle} ${colorStyle}">
+                        <span style="width: 30px; font-weight: bold; color: var(--gold-light);">${medal}</span> 
+                        <span style="flex:1; text-align: left; padding-left: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${pName}</span> 
+                        <span style="color: var(--accent-blue); font-weight: bold;">${pScore.toLocaleString()}</span>
                     </div>
                 `;
-                
-                let rank = 1;
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    let medal = rank === 1 ? '🥇 ' : (rank === 2 ? '🥈 ' : (rank === 3 ? '🥉 ' : ''));
-                    let isMe = (gameState && data.playerName === gameState.selectedHero.toUpperCase()) ? 'background: rgba(245, 197, 66, 0.15); border-radius: 6px; font-weight: 700;' : 'border-bottom: 1px solid #222;';
-                    html += `
-                        <div style="display: flex; justify-content: space-between; padding: 6px; ${isMe}">
-                            <span>${medal}${rank}</span> <span>${data.playerName}</span> <span style="color: var(--gold-light);">${data.score.toLocaleString()}</span>
-                        </div>
-                    `;
-                    rank++;
-                });
-                
-                if (snapshot.empty) {
-                    html += '<div style="padding: 10px; text-align:center; color:#aaa;">Henüz skor kaydedilmedi.</div>';
-                }
-                
-                listEl.innerHTML = html;
-            } catch (e) {
-                console.error("Fetch Leaderboard Error:", e);
-                listEl.innerHTML = '<div style="padding: 10px; text-align:center; color: var(--accent-red);">Bağlantı Hatası veya Eksik API Anahtarı. (firebaseConfig düzenlenmeli)</div>';
             }
+            listEl.innerHTML = html;
         }
 
         async function submitScoreToFirebase(score) {
@@ -1456,13 +2101,18 @@
             gems: 50,
             energy: 5,
             maxEnergy: 5,
+            lastEnergyUpdate: Date.now(),
             playerLevel: 1,
             totalScore: 0,
             selectedHero: 'asterion',
             viewedHero: 'asterion',
             unlockedLevel: 1,
             completedLevels: {},
-            currentPlayingLevel: 1
+            currentPlayingLevel: 1,
+            inventory: { zeus: 2, athena: 2, poseidon: 1 },
+            stats: { totalGemsBroken: 0, powersUsed: 0, itemsBought: 0 },
+            lastLoginDate: null,
+            loginStreak: 0
         };
 
         let gameState = Object.assign({}, defaultState);
@@ -1470,8 +2120,55 @@
         if (localStorage.getItem('arkenya_save_v8')) {
             try {
                 gameState = Object.assign(gameState, JSON.parse(localStorage.getItem('arkenya_save_v8')));
+                // Handle legacy saves without lastEnergyUpdate or inventory
+                if (!gameState.lastEnergyUpdate) gameState.lastEnergyUpdate = Date.now();
+                if (!gameState.stats) gameState.stats = { totalGemsBroken: 0, powersUsed: 0, itemsBought: 0, questsClaimed: {} };
+                if (!gameState.inventory) gameState.inventory = { zeus: 2, athena: 2, poseidon: 1 };
+                if (gameState.inventory.zeus === undefined || gameState.inventory.zeus === 0) gameState.inventory.zeus = 2;
+                if (gameState.inventory.athena === undefined || gameState.inventory.athena === 0) gameState.inventory.athena = 2;
+                if (!gameState.stats.questsClaimed) gameState.stats.questsClaimed = {};
             } catch(e){}
         }
+
+        // Energy Regeneration System (1 Energy every 10 minutes)
+        const ENERGY_REGEN_MS = 10 * 60 * 1000;
+        
+        function checkEnergyRegen() {
+            if (gameState.energy >= gameState.maxEnergy) {
+                gameState.lastEnergyUpdate = Date.now();
+                document.getElementById('hud-energy-timer').innerText = "DOLU";
+                return;
+            }
+
+            const now = Date.now();
+            const diff = now - gameState.lastEnergyUpdate;
+            const energyToAdd = Math.floor(diff / ENERGY_REGEN_MS);
+
+            if (energyToAdd > 0) {
+                gameState.energy = Math.min(gameState.maxEnergy, gameState.energy + energyToAdd);
+                gameState.lastEnergyUpdate += energyToAdd * ENERGY_REGEN_MS; // keep remainder
+                saveGame();
+            }
+
+            // Update timer text
+            if (gameState.energy < gameState.maxEnergy) {
+                const remainder = ENERGY_REGEN_MS - (now - gameState.lastEnergyUpdate);
+                const mins = Math.floor(remainder / 60000);
+                const secs = Math.floor((remainder % 60000) / 1000);
+                const timeStr = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                
+                const hudTimer = document.getElementById('hud-energy-timer');
+                if(hudTimer) hudTimer.innerText = timeStr;
+                
+                const uiTimer = document.getElementById('out-of-lives-timer');
+                if (uiTimer) uiTimer.innerText = timeStr;
+            } else {
+                const hudTimer = document.getElementById('hud-energy-timer');
+                if(hudTimer) hudTimer.innerText = "DOLU";
+            }
+        }
+        
+        setInterval(checkEnergyRegen, 1000);
 
         function saveGame() {
             localStorage.setItem('arkenya_save_v8', JSON.stringify(gameState));
@@ -1485,11 +2182,25 @@
                 gameState = Object.assign({}, defaultState);
                 saveGame();
                 openWorldMap();
-                alert("Oyun sıfırlandı! Asterion aktif.");
+                showToast("Oyun sıfırlandı! Asterion aktif.", "info");
             }
         }
 
         const HEROES = {
+            arkenya: { 
+                name: "ARKENYA", 
+                role: "MYTHIC CHAMPION", 
+                hp: 2000, 
+                atk: 950, 
+                def: 800, 
+                crit: "20%", 
+                ability: "Divine Smite", 
+                desc: "Kutsal kılıcı ile rastgele 5 hedefi yok eder.",
+                bg: "Assets/Art/hero_arkenya.jpg",
+                unlockReqLvl: 1,
+                unlockReqScore: 0,
+                reqText: "Efsanevi Kahraman (Açık)"
+            },
             asterion: { 
                 name: "ASTERION", 
                 role: "MINOTAUR WARRIOR", 
@@ -1535,56 +2246,56 @@
         };
 
                 const LEVEL_DATA = {
-            1: { title: "Herkül'ün Uyanışı", desc: "Olimpos'a giden yolda ilk adımını at, taşları eşleştirerek gücünü kanıtla!", targetScore: 5000, maxMoves: 35 },
-            2: { title: "Kiklop Mağarası", desc: "Tek gözlü devin dikkatini dağıtmak için hızlıca mücevherleri patlat.", targetScore: 6000, maxMoves: 35 },
-            3: { title: "Minotor'un Labirenti", desc: "Karanlık dehlizlerde yolunu bulmak için zekanı kullan ve engelleri aş.", targetScore: 7250, maxMoves: 34 },
-            4: { title: "Medusa'nın Gözyaşları", desc: "Taşa dönmemek için sihirli yakutları toplayarak kalkanını güçlendir.", targetScore: 8250, maxMoves: 34 },
-            5: { title: "Pegasus'un Kanatları", desc: "Gökyüzüne yükselmek için aynı renkteki rüzgar taşlarını bir araya getir.", targetScore: 9500, maxMoves: 34 },
-            6: { title: "İkarus'un Düşüşü", desc: "Güneşe çok yaklaşmadan hedefine ulaşmaya çalış, hamlelerini dikkatli seç.", targetScore: 10500, maxMoves: 33 },
-            7: { title: "Nemea Aslanı", desc: "Yenilmez postu aşmak için büyük kombolar yaparak aslanı dize getir.", targetScore: 11750, maxMoves: 33 },
-            8: { title: "Lerna Ejderhası", desc: "Kesilen her başın yerine iki tane çıkmadan seri eşleştirmeler yap.", targetScore: 12750, maxMoves: 33 },
-            9: { title: "Erymanthos Yaban Domuzu", desc: "Öfkeli canavarı yormak için tahtadaki toprak elementlerini temizle.", targetScore: 14000, maxMoves: 33 },
-            10: { title: "Hades'in Kapıları (BOSS)", desc: "Yeraltı dünyasının lordunu geçmek için en büyük Zeus patlamalarını tetikle!", targetScore: 15000, maxMoves: 32 },
-            11: { title: "Styx Nehri", desc: "Kayıp ruhları karşıya geçirmek için nehrin akışını kontrol eden kristalleri bul.", targetScore: 16250, maxMoves: 32 },
-            12: { title: "Kerberos'un Üç Başı", desc: "Cehennem tazısını sakinleştirmek için üçlü kombolarla et parçaları topla.", targetScore: 17250, maxMoves: 32 },
-            13: { title: "Tartarus'un Derinlikleri", desc: "Karanlık hapishaneden kaçmak için zincirli taşların kilidini kır.", targetScore: 18500, maxMoves: 31 },
-            14: { title: "Titanların Ayaklanması", desc: "Kadim devlerin öfkesini dindirmek için element dengesini sağla.", targetScore: 19500, maxMoves: 31 },
-            15: { title: "Atlas'ın Yükü", desc: "Dünyanın ağırlığını hafifletmek için tahtanın altındaki kaya taşlarını yok et.", targetScore: 20750, maxMoves: 31 },
-            16: { title: "Prometheus'un Ateşi", desc: "İnsanlığa ateşi ulaştırmak için buzlu taşları erit.", targetScore: 21750, maxMoves: 30 },
-            17: { title: "Pandora'nın Kutusu", desc: "Kutudan çıkan kötülükleri geri hapsetmek için hızlı ve keskin oyna.", targetScore: 23000, maxMoves: 30 },
-            18: { title: "Sirenlerin Şarkısı", desc: "Büyülü sese aldanmamak için mavi safirleri toplayıp zihnini koru.", targetScore: 24000, maxMoves: 30 },
-            19: { title: "Scylla ve Charybdis", desc: "İki canavar arasından gemini sağ salim geçirmek için orta sütunu temizle.", targetScore: 25250, maxMoves: 29 },
-            20: { title: "Poseidon'un Öfkesi (BOSS)", desc: "Denizler tanrısının fırtınalarını dindirmek için üçlü eşleştirmelerle okyanusu sakinleştir!", targetScore: 26250, maxMoves: 29 },
-            21: { title: "Apollon'un Liri", desc: "Altın telleri titreterek melodiyi tamamla ve güneşin doğmasını sağla.", targetScore: 27500, maxMoves: 29 },
-            22: { title: "Artemis'in Yayı", desc: "Ormanın derinliklerinde gümüş okları toplayarak avını yakala.", targetScore: 28500, maxMoves: 29 },
-            23: { title: "Ares'in Savaş Arabası", desc: "Savaş alanında kaos yaratmak için kırmızı yakutlarla zincirleme patlamalar yap.", targetScore: 29750, maxMoves: 28 },
-            24: { title: "Afrodit'in Güzelliği", desc: "Aşk tanrıçasını etkilemek için en parlak pembe elmasları bir araya getir.", targetScore: 30750, maxMoves: 28 },
-            25: { title: "Hermes'in Kanatlı Sandaletleri", desc: "Haberci tanrıya yetişmek için en az hamleyle en yüksek puanı topla.", targetScore: 32000, maxMoves: 28 },
-            26: { title: "Hephaistos'un Örsü", desc: "Ateş ve metali döverek yeni efsanevi silahlar yaratmak için taşları erit.", targetScore: 33000, maxMoves: 27 },
-            27: { title: "Demeter'in Bereketi", desc: "Kurak toprakları yeşertmek için zümrütleri toplayıp doğayı canlandır.", targetScore: 34250, maxMoves: 27 },
-            28: { title: "Dionysos'un Şöleni", desc: "Kutlamalara katılmak için mor ametistleri toplayıp neşeyi artır.", targetScore: 35250, maxMoves: 27 },
-            29: { title: "Athena'nın Zekası", desc: "Baykuşun bilgeliğiyle karmaşık bulmacaları stratejik hamlelerle çöz.", targetScore: 36500, maxMoves: 26 },
-            30: { title: "Zeus'un Yıldırımları (BOSS)", desc: "Tanrıların kralına karşı gücünü kanıtla, gök gürültüsü kombolarıyla tahtayı sars!", targetScore: 37500, maxMoves: 26 },
-            31: { title: "Orpheus'un Hüznü", desc: "Eurydice'yi geri getirmek için karanlık taşları müzik kombolarıyla aydınlat.", targetScore: 38750, maxMoves: 26 },
-            32: { title: "Argonautların Seferi", desc: "Altın Post'u bulmak için zorlu denizlerde mücevher haritasını tamamla.", targetScore: 39750, maxMoves: 26 },
-            33: { title: "Talos'un Bronz Zırhı", desc: "Devasa metal bekçinin zayıf noktasını bulmak için köşe taşlarını patlat.", targetScore: 41000, maxMoves: 25 },
-            34: { title: "Kharon'un Kayığı", desc: "Ölüler nehrini geçmek için altın sikkeleri topla ve kayıkçıya öde.", targetScore: 42000, maxMoves: 25 },
-            35: { title: "Midas'ın Dokunuşu", desc: "Her şeyi altına çeviren lanetten kurtulmak için altın taşları normale döndür.", targetScore: 43250, maxMoves: 25 },
-            36: { title: "Gorgon'un Bakışı", desc: "Taşlaşmış hücreleri kırmak için etraflarındaki mücevherleri arka arkaya patlat.", targetScore: 44250, maxMoves: 24 },
-            37: { title: "Eris'in Altın Elması", desc: "Kaosu önlemek için uyumsuz taşları hızla tahtadan temizle.", targetScore: 45500, maxMoves: 24 },
-            38: { title: "Hesperidlerin Bahçesi", desc: "Ölümsüzlük elmalarını koruyan ejderhayı atlatarak meyveleri topla.", targetScore: 46500, maxMoves: 24 },
-            39: { title: "Nemesis'in Terazisi", desc: "İlahi adaleti sağlamak için tahtanın sağ ve sol tarafındaki renkleri dengele.", targetScore: 47750, maxMoves: 23 },
-            40: { title: "Hades'in Dönüşü (BOSS)", desc: "Yeraltı tanrısı daha güçlü döndü! Tüm özel yeteneklerini kullanarak onu mağlup et!", targetScore: 48750, maxMoves: 23 },
-            41: { title: "Olimpos'un Etekleri", desc: "Zirveye yaklaşırken son engelleri aşmak için en uzun eşleştirme zincirlerini kur.", targetScore: 50000, maxMoves: 23 },
-            42: { title: "Kader Tanrıçaları (Moiralar)", desc: "Kader ipliklerini doğru örmek için renk sıralamasına dikkat ederek ilerle.", targetScore: 51000, maxMoves: 22 },
-            43: { title: "Uranüs'ün Yıldızları", desc: "Gökyüzünün ilk tanrısına ulaşmak için astral kristalleri topla.", targetScore: 52250, maxMoves: 22 },
-            44: { title: "Gaia'nın Kalbi", desc: "Toprak ananın enerjisini hissetmek için yeşil taşlarla büyük patlamalar yarat.", targetScore: 53250, maxMoves: 22 },
-            45: { title: "Kronos'un Zamanı", desc: "Zaman daralıyor! Kum saatleri dolmadan hedef puana ulaşmalısın.", targetScore: 54500, maxMoves: 22 },
-            46: { title: "Eros'un Okları", desc: "Farklı renkteki taşları birbiriyle eşleştirerek sevgi bağları kur.", targetScore: 55500, maxMoves: 21 },
-            47: { title: "Hyperion'un Işığı", desc: "Karanlık bölümleri aydınlatmak için güneş taşlarını patlat.", targetScore: 56750, maxMoves: 21 },
-            48: { title: "Nyx'in Gecesi", desc: "Gecenin karanlığında sadece parlayan mücevherleri bularak yolunu çiz.", targetScore: 57750, maxMoves: 21 },
-            49: { title: "Elysium Çayırları", desc: "Kahramanların cennetinde huzuru bulmak için son bulmacaları kolayca çöz.", targetScore: 59000, maxMoves: 20 },
-            50: { title: "Olimpos'un Zirvesi (GRAND BOSS)", desc: "Tüm tanrıların gücünü test et! Evrenin en güçlü kahramanı olmak için tahtayı paramparça et!", targetScore: 60000, maxMoves: 20 },
+            1: { title: "Herkül'ün Uyanışı", desc: "Olimpos'a giden yolda ilk adımını at, taşları eşleştirerek gücünü kanıtla!", targetScore: 7500, maxMoves: 35 },
+            2: { title: "Kiklop Mağarası", desc: "Tek gözlü devin dikkatini dağıtmak için hızlıca mücevherleri patlat.", targetScore: 8250, maxMoves: 32 },
+            3: { title: "Minotor'un Labirenti", desc: "Karanlık dehlizlerde yolunu bulmak için zekanı kullan ve engelleri aş.", targetScore: 8500, maxMoves: 34 },
+            4: { title: "Medusa'nın Gözyaşları", desc: "Taşa dönmemek için sihirli yakutları toplayarak kalkanını güçlendir.", targetScore: 10750, maxMoves: 36 },
+            5: { title: "Pegasus'un Kanatları", desc: "Gökyüzüne yükselmek için aynı renkteki rüzgar taşlarını bir araya getir.", targetScore: 13500, maxMoves: 34 },
+            6: { title: "İkarus'un Düşüşü", desc: "Güneşe çok yaklaşmadan hedefine ulaşmaya çalış, hamlelerini dikkatli seç.", targetScore: 14500, maxMoves: 31 },
+            7: { title: "Nemea Aslanı", desc: "Yenilmez postu aşmak için büyük kombolar yaparak aslanı dize getir.", targetScore: 14500, maxMoves: 32 },
+            8: { title: "Lerna Ejderhası", desc: "Kesilen her başın yerine iki tane çıkmadan seri eşleştirmeler yap.", targetScore: 16500, maxMoves: 34 },
+            9: { title: "Erymanthos Yaban Domuzu", desc: "Öfkeli canavarı yormak için tahtadaki toprak elementlerini temizle.", targetScore: 19250, maxMoves: 33 },
+            10: { title: "Hades'in Kapıları (BOSS)", desc: "Yeraltı dünyasının lordunu geçmek için en büyük Zeus patlamalarını tetikle!", targetScore: 25750, maxMoves: 27 },
+            11: { title: "Styx Nehri", desc: "Kayıp ruhları karşıya geçirmek için nehrin akışını kontrol eden kristalleri bul.", targetScore: 20750, maxMoves: 30 },
+            12: { title: "Kerberos'un Üç Başı", desc: "Cehennem tazısını sakinleştirmek için üçlü kombolarla et parçaları topla.", targetScore: 22250, maxMoves: 32 },
+            13: { title: "Tartarus'un Derinlikleri", desc: "Karanlık hapishaneden kaçmak için zincirli taşların kilidini kır.", targetScore: 25000, maxMoves: 32 },
+            14: { title: "Titanların Ayaklanması", desc: "Kadim devlerin öfkesini dindirmek için element dengesini sağla.", targetScore: 26750, maxMoves: 29 },
+            15: { title: "Atlas'ın Yükü", desc: "Dünyanın ağırlığını hafifletmek için tahtanın altındaki kaya taşlarını yok et.", targetScore: 27000, maxMoves: 28 },
+            16: { title: "Prometheus'un Ateşi", desc: "İnsanlığa ateşi ulaştırmak için buzlu taşları erit.", targetScore: 28000, maxMoves: 30 },
+            17: { title: "Pandora'nın Kutusu", desc: "Kutudan çıkan kötülükleri geri hapsetmek için hızlı ve keskin oyna.", targetScore: 30750, maxMoves: 31 },
+            18: { title: "Sirenlerin Şarkısı", desc: "Büyülü sese aldanmamak için mavi safirleri toplayıp zihnini koru.", targetScore: 33000, maxMoves: 28 },
+            19: { title: "Scylla ve Charybdis", desc: "İki canavar arasından gemini sağ salim geçirmek için orta sütunu temizle.", targetScore: 33250, maxMoves: 26 },
+            20: { title: "Poseidon'un Öfkesi (BOSS)", desc: "Denizler tanrısının fırtınalarını dindirmek için üçlü eşleştirmelerle okyanusu sakinleştir!", targetScore: 39000, maxMoves: 25 },
+            21: { title: "Apollon'un Liri", desc: "Altın telleri titreterek melodiyi tamamla ve güneşin doğmasını sağla.", targetScore: 36500, maxMoves: 30 },
+            22: { title: "Artemis'in Yayı", desc: "Ormanın derinliklerinde gümüş okları toplayarak avını yakala.", targetScore: 39000, maxMoves: 27 },
+            23: { title: "Ares'in Savaş Arabası", desc: "Savaş alanında kaos yaratmak için kırmızı yakutlarla zincirleme patlamalar yap.", targetScore: 39500, maxMoves: 25 },
+            24: { title: "Afrodit'in Güzelliği", desc: "Aşk tanrıçasını etkilemek için en parlak pembe elmasları bir araya getir.", targetScore: 40000, maxMoves: 26 },
+            25: { title: "Hermes'in Kanatlı Sandaletleri", desc: "Haberci tanrıya yetişmek için en az hamleyle en yüksek puanı topla.", targetScore: 42250, maxMoves: 28 },
+            26: { title: "Hephaistos'un Örsü", desc: "Ateş ve metali döverek yeni efsanevi silahlar yaratmak için taşları erit.", targetScore: 45000, maxMoves: 26 },
+            27: { title: "Demeter'in Bereketi", desc: "Kurak toprakları yeşertmek için zümrütleri toplayıp doğayı canlandır.", targetScore: 45750, maxMoves: 24 },
+            28: { title: "Dionysos'un Şöleni", desc: "Kutlamalara katılmak için mor ametistleri toplayıp neşeyi artır.", targetScore: 46000, maxMoves: 24 },
+            29: { title: "Athena'nın Zekası", desc: "Baykuşun bilgeliğiyle karmaşık bulmacaları stratejik hamlelerle çöz.", targetScore: 48000, maxMoves: 27 },
+            30: { title: "Zeus'un Yıldırımları (BOSS)", desc: "Tanrıların kralına karşı gücünü kanıtla, gök gürültüsü kombolarıyla tahtayı sars!", targetScore: 55750, maxMoves: 23 },
+            31: { title: "Orpheus'un Hüznü", desc: "Eurydice'yi geri getirmek için karanlık taşları müzik kombolarıyla aydınlat.", targetScore: 52000, maxMoves: 23 },
+            32: { title: "Argonautların Seferi", desc: "Altın Post'u bulmak için zorlu denizlerde mücevher haritasını tamamla.", targetScore: 52250, maxMoves: 23 },
+            33: { title: "Talos'un Bronz Zırhı", desc: "Devasa metal bekçinin zayıf noktasını bulmak için köşe taşlarını patlat.", targetScore: 53750, maxMoves: 25 },
+            34: { title: "Kharon'un Kayığı", desc: "Ölüler nehrini geçmek için altın sikkeleri topla ve kayıkçıya öde.", targetScore: 56750, maxMoves: 25 },
+            35: { title: "Midas'ın Dokunuşu", desc: "Her şeyi altına çeviren lanetten kurtulmak için altın taşları normale döndür.", targetScore: 58250, maxMoves: 22 },
+            36: { title: "Gorgon'un Bakışı", desc: "Taşlaşmış hücreleri kırmak için etraflarındaki mücevherleri arka arkaya patlat.", targetScore: 58500, maxMoves: 21 },
+            37: { title: "Eris'in Altın Elması", desc: "Kaosu önlemek için uyumsuz taşları hızla tahtadan temizle.", targetScore: 59750, maxMoves: 23 },
+            38: { title: "Hesperidlerin Bahçesi", desc: "Ölümsüzlük elmalarını koruyan ejderhayı atlatarak meyveleri topla.", targetScore: 62500, maxMoves: 23 },
+            39: { title: "Nemesis'in Terazisi", desc: "İlahi adaleti sağlamak için tahtanın sağ ve sol tarafındaki renkleri dengele.", targetScore: 64500, maxMoves: 21 },
+            40: { title: "Hades'in Dönüşü (BOSS)", desc: "Yeraltı tanrısı daha güçlü döndü! Tüm özel yeteneklerini kullanarak onu mağlup et!", targetScore: 69750, maxMoves: 16 },
+            41: { title: "Olimpos'un Etekleri", desc: "Zirveye yaklaşırken son engelleri aşmak için en uzun eşleştirme zincirlerini kur.", targetScore: 65500, maxMoves: 21 },
+            42: { title: "Kader Tanrıçaları (Moiralar)", desc: "Kader ipliklerini doğru örmek için renk sıralamasına dikkat ederek ilerle.", targetScore: 68250, maxMoves: 22 },
+            43: { title: "Uranüs'ün Yıldızları", desc: "Gökyüzünün ilk tanrısına ulaşmak için astral kristalleri topla.", targetScore: 70500, maxMoves: 20 },
+            44: { title: "Gaia'nın Kalbi", desc: "Toprak ananın enerjisini hissetmek için yeşil taşlarla büyük patlamalar yarat.", targetScore: 71000, maxMoves: 18 },
+            45: { title: "Kronos'un Zamanı", desc: "Zaman daralıyor! Kum saatleri dolmadan hedef puana ulaşmalısın.", targetScore: 71500, maxMoves: 19 },
+            46: { title: "Eros'un Okları", desc: "Farklı renkteki taşları birbiriyle eşleştirerek sevgi bağları kur.", targetScore: 74000, maxMoves: 21 },
+            47: { title: "Hyperion'un Işığı", desc: "Karanlık bölümleri aydınlatmak için güneş taşlarını patlat.", targetScore: 76500, maxMoves: 19 },
+            48: { title: "Nyx'in Gecesi", desc: "Gecenin karanlığında sadece parlayan mücevherleri bularak yolunu çiz.", targetScore: 77250, maxMoves: 16 },
+            49: { title: "Elysium Çayırları", desc: "Kahramanların cennetinde huzuru bulmak için son bulmacaları kolayca çöz.", targetScore: 77500, maxMoves: 17 },
+            50: { title: "Olimpos'un Zirvesi (GRAND BOSS)", desc: "Tüm tanrıların gücünü test et! Evrenin en güçlü kahramanı olmak için tahtayı paramparça et!", targetScore: 84500, maxMoves: 16 },
 };
 
         function isHeroUnlocked(heroId) {
@@ -1600,11 +2311,18 @@
 
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             const targetScreen = document.getElementById(screenId);
-            if (targetScreen) targetScreen.classList.add('active');
+            if (targetScreen) {
+                targetScreen.classList.add('active');
+                if (screenId === 'screen-mainmenu') {
+                    targetScreen.style.backgroundImage = "url('Assets/Art/main_menu_clean_bg.jpg')";
+                    targetScreen.style.backgroundSize = "cover";
+                    targetScreen.style.backgroundPosition = "center";
+                }
+            }
             
             const globalHud = document.getElementById('global-hud');
             if (globalHud) {
-                globalHud.style.display = (screenId !== 'screen-splash' ? 'flex' : 'none');
+                globalHud.style.display = (screenId === 'screen-gameplay' || screenId === 'screen-splash') ? 'none' : 'flex';
             }
 
             const globalBottomNav = document.getElementById('global-bottom-nav');
@@ -1623,6 +2341,30 @@
 
             updateHUD();
             updateHeroLockBadges();
+        }
+
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            if (container.children.length >= 2) {
+                container.removeChild(container.firstChild);
+            }
+            const toast = document.createElement('div');
+            toast.className = 'toast-msg';
+            if (type === 'error') {
+                toast.style.borderColor = 'var(--accent-red)';
+                toast.style.color = '#ff9999';
+            } else if (type === 'success') {
+                toast.style.borderColor = 'var(--accent-green)';
+                toast.style.color = '#99ffbb';
+            }
+            toast.innerText = msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.remove();
+                }
+            }, 2500);
         }
 
         function updateHUD() {
@@ -1845,11 +2587,10 @@
                 const statusText = isCompleted ? '⭐'.repeat(completedLvl[i]) : (isUnlocked ? '🔓 OYNANABİLİR' : '🔒 KİLİTLİ');
 
                 card.innerHTML = `
-                    <div class="wood-card-info" style="flex:1; padding-right: 10px;">
+                    <div class="wood-card-info">
                         <div class="wood-card-title">
                             ${isBoss ? '👾' : '🏛️'} BÖLÜM ${i}: ${levelInfo.title}
                         </div>
-                        <div class="wood-card-story">"${levelInfo.desc}"</div>
                         <div class="wood-card-meta">
                             <div class="wood-card-info-row">🎯 Hedef: ${targetScore}</div>
                             <div class="wood-card-status ${statusClass}">${statusText}</div>
@@ -1864,8 +2605,45 @@
             }
         }
 
+        const ZONE_BACKGROUNDS = {
+            1: 'Assets/Art/main_menu_clean_bg.jpg',
+            2: 'Assets/Art/zone2_poseidon_bg.jpg',
+            3: 'Assets/Art/zone3_hades_bg.jpg',
+            4: 'Assets/Art/zone4_olympus_bg.jpg'
+        };
+
+        function getZoneForLevel(levelNum) {
+            const lvl = levelNum || 1;
+            if (lvl <= 10) return 1;
+            if (lvl <= 25) return 2;
+            if (lvl <= 40) return 3;
+            return 4;
+        }
+
+        function updateDynamicZoneBackground(levelNum) {
+            const lvl = levelNum || gameState.currentPlayingLevel || 1;
+            const zone = getZoneForLevel(lvl);
+            const bgUrl = ZONE_BACKGROUNDS[zone];
+
+            const gameplayScreen = document.getElementById('screen-gameplay');
+            if (gameplayScreen) {
+                gameplayScreen.style.backgroundImage = `url('${bgUrl}')`;
+                gameplayScreen.style.backgroundSize = 'cover';
+                gameplayScreen.style.backgroundPosition = 'center';
+            }
+
+            const worldmapScreen = document.getElementById('screen-worldmap');
+            if (worldmapScreen) {
+                worldmapScreen.style.backgroundImage = `linear-gradient(rgba(4, 6, 10, 0.4), rgba(4, 6, 10, 0.4)), url('${bgUrl}')`;
+                worldmapScreen.style.backgroundSize = 'cover';
+                worldmapScreen.style.backgroundPosition = 'center';
+            }
+        }
+
         function openLevelPreview(levelId) {
             gameState.currentPlayingLevel = levelId;
+            updateDynamicZoneBackground(levelId);
+
             const fallbackTarget = 3000 + (levelId * 150);
             const levelInfo = LEVEL_DATA[levelId] || { 
                 title: `Bölüm ${levelId}`, 
@@ -1895,9 +2673,44 @@
         let gameTarget = 3000;
         let gameGauge = 0;
         let gridData = [];
+        let isSwapping = false;
+        let isCascading = false;
+        let isLevelEnding = false;
+
+        function updateStarProgressBar() {
+            const fill = document.getElementById('game-star-progress-fill');
+            if (!fill) return;
+            const pct = Math.min(100, Math.floor((gameScore / gameTarget) * 100));
+            fill.style.width = `${pct}%`;
+
+            const s1 = document.getElementById('hud-star-1');
+            const s2 = document.getElementById('hud-star-2');
+            const s3 = document.getElementById('hud-star-3');
+
+            if (s1) s1.classList.toggle('active', pct >= 50);
+            if (s2) s2.classList.toggle('active', pct >= 75);
+            if (s3) s3.classList.toggle('active', pct >= 100);
+        }
+
+        function restartFromPause() {
+            closeModal('modal-pause');
+            if (gameState.energy < 1) {
+                openModal('modal-out-of-lives');
+                return;
+            }
+            startGameplay();
+        }
 
         function startGameplay() {
-            closeModal('modal-level-preview');
+            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+            updateGameplayPowerups();
+
+            if (!gameState.currentPlayingLevel) {
+                gameState.currentPlayingLevel = gameState.unlockedLevel || 1;
+            }
+            const lvl = gameState.currentPlayingLevel;
+            updateDynamicZoneBackground(lvl);
+
             if (!gameState.energy || gameState.energy < 1) {
                 gameState.energy = 5;
             }
@@ -1905,15 +2718,21 @@
             gameState.energy--;
             saveGame();
 
-            const lvl = gameState.currentPlayingLevel || 1;
+            isLevelEnding = false;
+            isSwapping = false;
+            isCascading = false;
             gameMoves = (LEVEL_DATA[lvl] || {maxMoves: 30}).maxMoves;
             gameScore = 0;
-            gameTarget = (LEVEL_DATA[lvl] || {targetScore: 3000 + (lvl * 150)}).targetScore;
+            gameTarget = (LEVEL_DATA[lvl] || {targetScore: 7500}).targetScore;
             gameGauge = 0;
 
             document.getElementById('game-moves').innerText = gameMoves;
             document.getElementById('game-score').innerText = "0";
             document.getElementById('game-level-lbl').innerText = `BÖLÜM ${lvl}`;
+            const gameEnergyEl = document.getElementById('game-energy-val');
+            if (gameEnergyEl) gameEnergyEl.innerText = gameState.energy;
+
+            updateStarProgressBar();
 
             const heroKey = (gameState.selectedHero && HEROES[gameState.selectedHero]) ? gameState.selectedHero : 'asterion';
             const hero = HEROES[heroKey];
@@ -1924,28 +2743,30 @@
                 if (abilityEl) abilityEl.innerText = hero.ability;
             }
 
-            const btnZeus = document.getElementById('btn-summon-zeus');
-            const btnPoseidon = document.getElementById('btn-summon-poseidon');
-            const btnAthena = document.getElementById('btn-summon-athena');
-
-            if (btnZeus) btnZeus.disabled = true;
-            if (btnPoseidon) btnPoseidon.disabled = true;
-            if (btnAthena) btnAthena.disabled = true;
+            updateGameplayPowerups();
 
             initGrid();
             showScreen('screen-gameplay');
+            
+            // Show Onboarding tutorial if level 1 and not yet completed
+            if (lvl === 1 && (!gameState.completedLevels || !gameState.completedLevels[1])) {
+                setTimeout(() => {
+                    document.getElementById('modal-onboarding').classList.add('active');
+                }, 800);
+            }
         }
 
         const GEM_TYPES = ['red', 'blue', 'green', 'yellow', 'purple'];
         const GEM_ICONS = { red: '💎', blue: '🔷', green: '❇️', yellow: '🌟', purple: '🔮' };
         let selectedCell = null;
         let touchStartX = 0, touchStartY = 0, touchStartCell = null;
-
-        
         let swipeStartX = 0, swipeStartY = 0, swipeStartCell = null;
+        let swapWatchdogTimer = null;
         
         function handleSwipeStart(e) {
-            e.preventDefault(); // Prevent default dragging
+            if (e.type === 'touchstart') {
+                e.preventDefault();
+            }
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
             swipeStartX = clientX;
@@ -1955,7 +2776,6 @@
                 c: parseInt(this.dataset.c), 
                 el: this 
             };
-            onCellClick(swipeStartCell.r, swipeStartCell.c, swipeStartCell.el); // Also trigger click logic
         }
 
         function handleSwipeEnd(e) {
@@ -1966,7 +2786,7 @@
             const dy = clientY - swipeStartY;
             const dist = Math.sqrt(dx * dx + dy * dy);
 
-            if (dist > 25) { // Swipe threshold
+            if (dist > 25) { // Swipe threshold executed
                 let tr = swipeStartCell.r, tc = swipeStartCell.c;
                 if (Math.abs(dx) > Math.abs(dy)) {
                     tc += (dx > 0 ? 1 : -1); // Left/Right
@@ -1977,6 +2797,8 @@
                 if (tr >= 0 && tr < 8 && tc >= 0 && tc < 8) {
                     executeSwap(swipeStartCell.r, swipeStartCell.c, tr, tc);
                 }
+            } else { // Single Tap / Click
+                onCellClick(swipeStartCell.r, swipeStartCell.c, swipeStartCell.el);
             }
             swipeStartCell = null;
         }
@@ -1999,47 +2821,60 @@
                     cell.dataset.r = r;
                     cell.dataset.c = c;
                     
-                    // Unified Click & Touch Drag Handlers
-                    cell.onclick = () => onCellClick(r, c, cell);
-
-
-                    // Better Swipe & Drag Mechanics
+                    // Touch & Mouse Drag Handlers
                     cell.addEventListener('mousedown', handleSwipeStart);
                     cell.addEventListener('touchstart', handleSwipeStart, {passive: false});
                     cell.addEventListener('mouseup', handleSwipeEnd);
                     cell.addEventListener('touchend', handleSwipeEnd);
-
 
                     gridEl.appendChild(cell);
                 }
             }
 
             // Immediately check and explode initial matches for dynamic entrance!
-            setTimeout(processMatchesWithExplosion, 150);
+            setTimeout(() => {
+                processMatchesWithExplosion(1, false);
+            }, 150);
+        }
+
+        function clearSelectedCell() {
+            if (selectedCell) {
+                if (selectedCell.el) selectedCell.el.classList.remove('selected');
+                selectedCell = null;
+            }
         }
 
         function onCellClick(r, c, el) {
-            if (gameMoves <= 0) return;
+            if (gameMoves <= 0 || isSwapping || isCascading || isLevelEnding) return;
 
             if (!selectedCell) {
                 selectedCell = { r, c, el };
                 el.classList.add('selected');
             } else {
                 const prev = selectedCell;
-                selectedCell.el.classList.remove('selected');
-                selectedCell = null;
+                clearSelectedCell();
 
                 if (Math.abs(prev.r - r) + Math.abs(prev.c - c) === 1) {
                     executeSwap(prev.r, prev.c, r, c);
+                } else {
+                    // Tap new cell as selection if not adjacent
+                    selectedCell = { r, c, el };
+                    el.classList.add('selected');
                 }
             }
         }
 
-        let isSwapping = false;
-        
         function executeSwap(r1, c1, r2, c2) {
-            if (gameMoves <= 0 || isSwapping) return;
+            if (gameMoves <= 0 || isSwapping || isLevelEnding) return;
             isSwapping = true;
+            clearSelectedCell();
+
+            // Safety Watchdog: force unlock after 1.5s if any cascade step freezes
+            clearTimeout(swapWatchdogTimer);
+            swapWatchdogTimer = setTimeout(() => {
+                isSwapping = false;
+                isCascading = false;
+            }, 1500);
 
             const cells = document.getElementById('game-grid').children;
             const idx1 = r1 * 8 + c1;
@@ -2051,14 +2886,18 @@
             const dx = (c2 - c1) * 48;
             const dy = (r2 - r1) * 48;
             
-            cell1.style.transform = `translate(${dx}px, ${dy}px)`;
-            cell2.style.transform = `translate(${-dx}px, ${-dy}px)`;
-            cell1.style.zIndex = '20';
+            if (cell1 && cell2) {
+                cell1.style.transform = `translate(${dx}px, ${dy}px)`;
+                cell2.style.transform = `translate(${-dx}px, ${-dy}px)`;
+                cell1.style.zIndex = '20';
+            }
             
             setTimeout(() => {
-                cell1.style.transform = '';
-                cell2.style.transform = '';
-                cell1.style.zIndex = '10';
+                if (cell1 && cell2) {
+                    cell1.style.transform = '';
+                    cell2.style.transform = '';
+                    cell1.style.zIndex = '10';
+                }
                 
                 // Perform data swap
                 const temp = gridData[r1][c1];
@@ -2070,19 +2909,91 @@
                 
                 if (matchedCount === 0) {
                     // Invalid move, swap back
-                    cell1.style.transform = `translate(${dx}px, ${dy}px)`;
-                    cell2.style.transform = `translate(${-dx}px, ${-dy}px)`;
+                    if (cell1 && cell2) {
+                        cell1.style.transform = `translate(${dx}px, ${dy}px)`;
+                        cell2.style.transform = `translate(${-dx}px, ${-dy}px)`;
+                    }
                     
                     setTimeout(() => {
-                        cell1.style.transform = '';
-                        cell2.style.transform = '';
+                        if (cell1 && cell2) {
+                            cell1.style.transform = '';
+                            cell2.style.transform = '';
+                        }
                         gridData[r2][c2] = gridData[r1][c1];
                         gridData[r1][c1] = temp;
                         renderGrid();
                         isSwapping = false;
+                        clearTimeout(swapWatchdogTimer);
                     }, 250);
                 }
             }, 250);
+        }
+
+        function checkGridHasMatches() {
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 6; c++) {
+                    if (gridData[r][c] && gridData[r][c] === gridData[r][c+1] && gridData[r][c] === gridData[r][c+2]) {
+                        return true;
+                    }
+                }
+            }
+            for (let c = 0; c < 8; c++) {
+                for (let r = 0; r < 6; r++) {
+                    if (gridData[r][c] && gridData[r+1][c] === gridData[r][c] && gridData[r+2][c] === gridData[r][c]) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function hasPossibleMatches() {
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 7; c++) {
+                    let temp = gridData[r][c];
+                    gridData[r][c] = gridData[r][c+1];
+                    gridData[r][c+1] = temp;
+                    let found = checkGridHasMatches();
+                    gridData[r][c+1] = gridData[r][c];
+                    gridData[r][c] = temp;
+                    if (found) return true;
+                }
+            }
+            for (let r = 0; r < 7; r++) {
+                for (let c = 0; c < 8; c++) {
+                    let temp = gridData[r][c];
+                    gridData[r][c] = gridData[r+1][c];
+                    gridData[r+1][c] = temp;
+                    let found = checkGridHasMatches();
+                    gridData[r+1][c] = gridData[r][c];
+                    gridData[r][c] = temp;
+                    if (found) return true;
+                }
+            }
+            return false;
+        }
+
+        function shuffleGrid() {
+            spawnFloatingCombo("🔄 HAMLE KALMADI, TAHTA KARIŞTIRILIYOR!");
+            let allTypes = [];
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    allTypes.push(gridData[r][c] || GEM_TYPES[Math.floor(Math.random() * GEM_TYPES.length)]);
+                }
+            }
+            let attempts = 0;
+            do {
+                allTypes.sort(() => Math.random() - 0.5);
+                let idx = 0;
+                for (let r = 0; r < 8; r++) {
+                    for (let c = 0; c < 8; c++) {
+                        gridData[r][c] = allTypes[idx++];
+                    }
+                }
+                attempts++;
+            } while ((checkGridHasMatches() || !hasPossibleMatches()) && attempts < 50);
+
+            renderGrid();
         }
 
         function processMatchesWithExplosion(comboMultiplier = 1, deductMove = false) {
@@ -2121,10 +3032,16 @@
                 });
 
                 // Scoring with Combo Multiplier
-                const baseEarned = matchesToPop.length * 250;
+                const baseEarned = matchesToPop.length * 50;
                 const earned = baseEarned * comboMultiplier;
                 gameScore += earned;
-                gameGauge = Math.min(100, gameGauge + matchesToPop.length * (3 * comboMultiplier));
+                const lvl = gameState.currentPlayingLevel || 1;
+                const chargePerBlock = 100 / (15 + (lvl * 3.0));
+                gameGauge = Math.min(100, gameGauge + (matchesToPop.length * chargePerBlock * (1 + (comboMultiplier * 0.2))));
+                
+                if (gameState && gameState.stats) {
+                    gameState.stats.totalGemsBroken += matchesToPop.length;
+                }
                 
                 if (comboMultiplier === 1) {
                     if (matchesToPop.length >= 4) {
@@ -2133,20 +3050,20 @@
                 } else if (comboMultiplier === 2) {
                     spawnFloatingScore(`🔥 KOMBO x2! +${earned}`);
                 } else if (comboMultiplier === 3) {
-                    spawnFloatingCombo(`💥 EFSANEVİ KOMBO x3! +${earned}`);
+                    spawnFloatingCombo(`🔥 EFSANEVİ KOMBO x3! +${earned}`);
                     triggerScreenShake();
                 } else if (comboMultiplier >= 4) {
-                    spawnFloatingCombo(`🌟 İNANILMAZ KOMBO x${comboMultiplier}! +${earned}`);
+                    spawnFloatingCombo(`✨ TANRISAL KOMBO x${comboMultiplier}! +${earned}`);
                     triggerScreenShake();
                 }
 
                 document.getElementById('game-score').innerText = gameScore.toLocaleString();
-                document.getElementById('game-gauge-txt').innerText = `${gameGauge}%`;
-                document.getElementById('btn-use-ability').disabled = gameGauge < 100;
+                updateStarProgressBar();
+                document.getElementById('game-gauge-txt').innerText = `${Math.floor(gameGauge)}% (Kombo)`;
+                const btnAbility = document.getElementById('btn-use-ability');
+                if (btnAbility) btnAbility.disabled = gameGauge < 100;
 
-                if (gameGauge >= 40) document.getElementById('btn-summon-zeus').disabled = false;
-                if (gameGauge >= 70) document.getElementById('btn-summon-poseidon').disabled = false;
-                if (gameGauge >= 90) document.getElementById('btn-summon-athena').disabled = false;
+                updateGameplayPowerups();
 
                 // Execute smooth column gravity drop & refill
                 setTimeout(() => {
@@ -2155,8 +3072,16 @@
             } else {
                 // Cascades finished
                 isSwapping = false;
-                if (gameMoves <= 0) {
-                    setTimeout(checkGameEnd, 1000);
+                isCascading = false;
+                clearTimeout(swapWatchdogTimer);
+
+                // Auto-shuffle grid if no possible moves remain
+                if (gameMoves > 0 && gameScore < gameTarget && !hasPossibleMatches()) {
+                    shuffleGrid();
+                }
+
+                if (gameMoves <= 0 || gameScore >= gameTarget) {
+                    setTimeout(checkGameEnd, 600);
                 }
             }
             return matchesToPop.length;
@@ -2210,26 +3135,81 @@
             setTimeout(() => popup.remove(), 850);
         }
 
-        function summonGod(godType) {
+        function usePowerup(godType) {
+            if (!gameState.inventory[godType] || gameState.inventory[godType] <= 0) {
+                showToast("Bu güçlendirmeye sahip değilsin. Pazar'dan satın alabilirsin!", "error");
+                return;
+            }
+            
+            gameState.inventory[godType]--;
+            saveGame();
+            updateGameplayPowerups();
+
             if (godType === 'zeus') {
-                gameScore += 5000;
-                spawnFloatingScore("⚡ ZEUS YILDIRIM PATLAMASI! +5000");
+                spawnFloatingCombo("⚡ ZEUS YILDIRIMI! ⚡");
+                triggerScreenShake();
+                const cells = document.getElementById('game-grid').children;
+                const validCells = [];
+                for(let r=0; r<8; r++) {
+                    for(let c=0; c<8; c++) {
+                        if (gridData[r][c] !== null) validCells.push({r,c});
+                    }
+                }
+                validCells.sort(() => Math.random() - 0.5);
+                const targets = validCells.slice(0, 5);
+                targets.forEach(t => {
+                    const idx = t.r * 8 + t.c;
+                    if (cells[idx]) cells[idx].classList.add('exploding');
+                    gridData[t.r][t.c] = null;
+                });
+                gameScore += 2500;
                 document.getElementById('game-score').innerText = gameScore.toLocaleString();
-                document.getElementById('btn-summon-zeus').disabled = true;
-            } else if (godType === 'poseidon') {
-                gameState.energy = Math.min(gameState.maxEnergy, gameState.energy + 2);
-                saveGame();
-                spawnFloatingScore("🔱 POSEIDON LÜTFU! +2 CAN");
-                document.getElementById('btn-summon-poseidon').disabled = true;
             } else if (godType === 'athena') {
-                gameMoves += 10;
+                gameMoves += 5;
                 document.getElementById('game-moves').innerText = gameMoves;
-                spawnFloatingScore("🛡️ ATHENA STRATEJİSİ! +10 HAMLE");
-                document.getElementById('btn-summon-athena').disabled = true;
+                spawnFloatingCombo("🛡️ ATHENA LÜTFU! +5 HAMLE 🛡️");
+                triggerScreenShake();
             }
 
-            initGrid();
-            // Victory check removed here to allow player to use up all their moves!
+            setTimeout(() => {
+                applyGravityAndRefill(1);
+            }, 350);
+        }
+
+        function updateGameplayPowerups() {
+            const btnZeus = document.getElementById('btn-powerup-zeus');
+            const lblZeus = document.getElementById('lbl-powerup-zeus');
+            const btnAthena = document.getElementById('btn-powerup-athena');
+            const lblAthena = document.getElementById('lbl-powerup-athena');
+
+            const zCount = (gameState.inventory && gameState.inventory.zeus) || 0;
+            const aCount = (gameState.inventory && gameState.inventory.athena) || 0;
+
+            if(btnZeus && lblZeus) {
+                lblZeus.innerText = `${zCount}x`;
+                if(zCount > 0) {
+                    btnZeus.classList.add('glow');
+                    lblZeus.classList.remove('empty');
+                    btnZeus.disabled = false;
+                } else {
+                    btnZeus.classList.remove('glow');
+                    lblZeus.classList.add('empty');
+                    btnZeus.disabled = false; // keep clickable so toast message informs player
+                }
+            }
+
+            if(btnAthena && lblAthena) {
+                lblAthena.innerText = `${aCount}x`;
+                if(aCount > 0) {
+                    btnAthena.classList.add('glow');
+                    lblAthena.classList.remove('empty');
+                    btnAthena.disabled = false;
+                } else {
+                    btnAthena.classList.remove('glow');
+                    lblAthena.classList.add('empty');
+                    btnAthena.disabled = false;
+                }
+            }
         }
 
         function renderGrid() {
@@ -2241,47 +3221,234 @@
                     const cell = cells[idx++];
                     cell.className = `cell cell-${type}`;
                     cell.draggable = false;
-                    cell.innerText = GEM_ICONS[type];
+                    cell.innerText = type ? GEM_ICONS[type] : '';
                 }
             }
         }
 
         function useAbility() {
-            if (gameGauge < 100) return;
+            if (gameGauge < 100 || isSwapping || isLevelEnding) return;
             gameGauge = 0;
-            gameScore += 3500;
-            spawnFloatingScore("💥 BOĞA ÖFKESİ PATLAMASI! +3500");
-            document.getElementById('game-score').innerText = gameScore.toLocaleString();
-            document.getElementById('game-gauge-txt').innerText = "0%";
+            
+            if (gameState && gameState.stats) gameState.stats.powersUsed++;
+            
+            triggerScreenShake();
+            
+            const heroId = gameState.selectedHero || 'arkenya';
+            const cells = document.getElementById('game-grid').children;
+            let blocksDestroyed = 0;
+            
+            if (heroId === 'arkenya') {
+                spawnFloatingCombo("💥 ARKENYA: DIVINE SMITE! 💥");
+                const validCells = [];
+                for(let r=0; r<8; r++) {
+                    for(let c=0; c<8; c++) {
+                        if (gridData[r][c] !== null) validCells.push({r,c});
+                    }
+                }
+                validCells.sort(() => Math.random() - 0.5);
+                const targets = validCells.slice(0, 5);
+                targets.forEach(t => {
+                    blocksDestroyed++;
+                    const idx = t.r * 8 + t.c;
+                    if (cells[idx]) cells[idx].classList.add('exploding');
+                    gridData[t.r][t.c] = null;
+                });
+            } else if (heroId === 'asterion') {
+                spawnFloatingCombo("💥 ASTERION: BULL RUSH! 💥");
+                for(let r=2; r<=4; r++) {
+                    for(let c=2; c<=5; c++) {
+                        if (gridData[r][c] !== null) {
+                            blocksDestroyed++;
+                            const idx = r * 8 + c;
+                            if (cells[idx]) cells[idx].classList.add('exploding');
+                            gridData[r][c] = null;
+                        }
+                    }
+                }
+            } else if (heroId === 'nyra') {
+                spawnFloatingCombo("🌈 NYRA: PRISM RUSH! 🌈");
+                const colors = [1,2,3,4,5,6];
+                const targetColor = colors[Math.floor(Math.random() * colors.length)];
+                for(let r=0; r<8; r++) {
+                    for(let c=0; c<8; c++) {
+                        if (gridData[r][c] === targetColor) {
+                            blocksDestroyed++;
+                            const idx = r * 8 + c;
+                            if (cells[idx]) cells[idx].classList.add('exploding');
+                            gridData[r][c] = null;
+                        }
+                    }
+                }
+            } else if (heroId === 'thalor') {
+                spawnFloatingCombo("🌊 THALOR: TIDE SHIELD! 🌊 (+5 Hamle)");
+                gameMoves += 5;
+                document.getElementById('game-moves').innerText = gameMoves;
+            }
+            
+            const earned = blocksDestroyed * 500;
+            if (earned > 0) {
+                gameScore += earned;
+                document.getElementById('game-score').innerText = gameScore.toLocaleString();
+            }
+            
+            document.getElementById('game-gauge-txt').innerText = "0% (Kombo)";
             document.getElementById('btn-use-ability').disabled = true;
-            initGrid();
-            // Victory check removed here to allow player to use up all their moves!
+            
+            setTimeout(() => {
+                applyGravityAndRefill(1);
+            }, 350);
         }
 
-        
+        function sfxVictory() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+                osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.15);
+                osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.3);
+                osc.frequency.setValueAtTime(1046.50, ctx.currentTime + 0.45);
+                gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.8);
+            } catch(e) {}
+        }
+
+        function sfxDefeat() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.setValueAtTime(300, ctx.currentTime);
+                osc.frequency.setValueAtTime(200, ctx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.6);
+            } catch(e) {}
+        }
+
         function checkGameEnd() {
+            if (isLevelEnding) return;
+
             if (gameScore >= gameTarget) {
-                spawnFloatingCombo("🎉 BÖLÜM GEÇİLDİ! 🎉");
-                setTimeout(showVictory, 1500);
-            } else {
-                document.getElementById('modal-defeat').classList.add('active');
+                isLevelEnding = true;
+                sfxVictory();
+                if (gameMoves > 0) {
+                    spawnFloatingCombo("⚡ TANRISAL BİTİRİŞ! ⚡");
+                    isCascading = true;
+                    setTimeout(triggerEndLevelCascade, 600);
+                } else {
+                    spawnFloatingCombo("🎉 BÖLÜM GEÇİLDİ! 🎉");
+                    setTimeout(showVictory, 800);
+                }
+            } else if (gameMoves <= 0) {
+                isLevelEnding = true;
+                if (gameScore >= gameTarget * 0.9) {
+                    document.getElementById('game-grid').style.boxShadow = "0 0 50px rgba(255, 0, 0, 0.8)";
+                    setTimeout(() => { document.getElementById('game-grid').style.boxShadow = "none"; }, 2000);
+                    spawnFloatingCombo("😲 ÇOK YAKLAŞTIN! 😲");
+                }
+                sfxDefeat();
+                openModal('modal-save-me');
             }
         }
 
 
+        function screenWipeAndExecute(callback) {
+            const wipe = document.getElementById('screen-wipe');
+            if (wipe) {
+                wipe.classList.add('active');
+                setTimeout(() => {
+                    callback();
+                    setTimeout(() => {
+                        wipe.classList.remove('active');
+                    }, 200);
+                }, 500);
+            } else {
+                callback();
+            }
+        }
+
         function showVictory() {
-            document.getElementById('victory-score').innerText = gameScore.toLocaleString();
             document.getElementById('modal-victory').classList.add('active');
 
+            // 3-Star Logic based on remaining moves
+            let stars = 1;
+            if (gameMoves >= 10) stars = 3;
+            else if (gameMoves >= 5) stars = 2;
+
             const lvl = gameState.currentPlayingLevel || 1;
-            gameState.completedLevels[lvl] = 3;
+            if (lvl === 50 && gameScore >= gameTarget) {
+                setTimeout(() => {
+                    document.getElementById('intermission-screen').style.display = 'none';
+                    openModal('modal-final-celebration');
+                    sfxVictory();
+                }, 2000);
+            }
+
+            if ((gameState.completedLevels[lvl] || 0) < stars) {
+                gameState.completedLevels[lvl] = stars;
+            }
+
+            // Animate stars
+            document.querySelectorAll('.victory-star').forEach(s => s.classList.remove('active'));
+            setTimeout(() => { document.getElementById('v-star-1').classList.add('active'); }, 300);
+            if (stars >= 2) setTimeout(() => { document.getElementById('v-star-2').classList.add('active'); }, 700);
+            if (stars >= 3) setTimeout(() => { document.getElementById('v-star-3').classList.add('active'); }, 1100);
+
+            // Calculate rewards
+            const earnedGold = 100 + Math.floor(gameScore / 100);
+            const isFirstTime = (gameState.completedLevels[lvl] || 0) === 0;
+            const earnedGems = isFirstTime ? 15 : 2;
+
             if (lvl >= gameState.unlockedLevel && lvl < 50) {
                 gameState.unlockedLevel = lvl + 1;
             }
+
             gameState.totalScore += gameScore;
             submitScoreToFirebase(gameState.totalScore);
-            gameState.gold += 250;
-            gameState.gems += 15;
+            gameState.gold += earnedGold;
+            gameState.gems += earnedGems;
+
+            // Animate score count up
+            const scoreEl = document.getElementById('victory-score');
+            const goldEl = document.getElementById('victory-gold');
+            const gemsEl = document.getElementById('victory-gems');
+            
+            let currentDisplayScore = 0;
+            let currentDisplayGold = 0;
+            let currentDisplayGems = 0;
+
+            const scoreInterval = setInterval(() => {
+                let finished = true;
+                
+                if (currentDisplayScore < gameScore) {
+                    currentDisplayScore = Math.min(gameScore, currentDisplayScore + Math.ceil(gameScore / 20));
+                    scoreEl.innerText = currentDisplayScore.toLocaleString();
+                    finished = false;
+                }
+                
+                if (currentDisplayGold < earnedGold) {
+                    currentDisplayGold = Math.min(earnedGold, currentDisplayGold + Math.ceil(earnedGold / 20));
+                    goldEl.innerText = currentDisplayGold.toLocaleString();
+                    finished = false;
+                }
+
+                if (currentDisplayGems < earnedGems) {
+                    currentDisplayGems = Math.min(earnedGems, currentDisplayGems + 1);
+                    gemsEl.innerText = currentDisplayGems.toLocaleString();
+                    finished = false;
+                }
+                
+                if (finished) clearInterval(scoreInterval);
+            }, 50);
 
             const nextLvlNum = Math.min(50, lvl + 1);
             document.getElementById('next-lvl-num-btn').innerText = nextLvlNum;
@@ -2296,33 +3463,144 @@
 
             saveGame();
         }
-
-        function playNextLevelDirectly() {
-            closeModal('modal-victory');
-            const lvl = gameState.currentPlayingLevel || 1;
-            if (lvl < 50) {
-                gameState.currentPlayingLevel = lvl + 1;
+        
+        function triggerEndLevelCascade() {
+            if (gameMoves <= 0) {
+                isCascading = false;
+                setTimeout(showVictory, 1500);
+                return;
             }
-            gameState.energy = 5;
+            
+            // Randomly turn a cell into a bomb
+            let r = Math.floor(Math.random() * 8);
+            let c = Math.floor(Math.random() * 8);
+            
+            // Deduct move
+            gameMoves--;
+            document.getElementById('game-moves').innerText = gameMoves;
+            
+            spawnFloatingCombo("+500 Puan!");
+            gameScore += 500;
+            updateProgressBar();
+            
+            // Recursion
+            setTimeout(triggerEndLevelCascade, 300);
+        }
+
+        function declineSaveMe() {
+            closeModal('modal-save-me');
+            if (gameState.energy > 0) {
+                gameState.energy--;
+                gameState.lastLifeLossTime = Date.now();
+                saveGame();
+                updateHUD();
+            }
+            sfxDefeat();
+            document.getElementById('modal-defeat').classList.add('active');
+        }
+
+        function buyExtraMoves() {
+            if (gameState.gems >= 100) {
+                gameState.gems -= 100;
+                saveGame();
+                closeModal('modal-save-me');
+                gameMoves += 5;
+                isLevelEnding = false;
+                document.getElementById('game-moves').innerText = gameMoves;
+                spawnFloatingCombo("⚡ +5 HAMLE ALINDI! ⚡");
+            } else {
+                showToast("Yeterli elmasın yok!", "error");
+            }
+        }
+        
+        function openIntermissionChest() {
+            const chest = document.getElementById('inter-chest');
+            if (chest.innerHTML === '✨') return;
+            chest.innerHTML = '✨';
+            document.getElementById('inter-chest-label').style.display = 'none';
+            
+            const rand = Math.random();
+            let goldReward = 150;
+            let gemReward = 5;
+            
+            if (rand < 0.1) {
+                goldReward = 500;
+                gemReward = 25;
+                spawnFloatingCombo("🎰 JACKPOT! 🎰");
+                document.getElementById('inter-chest').style.textShadow = "0 0 30px gold";
+            } else if (rand < 0.4) {
+                goldReward = 250;
+                gemReward = 10;
+            }
+            
+            gameState.gold += goldReward;
+            gameState.gems += gemReward;
+            saveGame();
+            
+            document.getElementById('inter-gold-reward').innerText = goldReward;
+            document.getElementById('inter-gem-reward').innerText = gemReward;
+            
+            setTimeout(() => { document.getElementById('inter-rewards').style.display = 'flex'; }, 400);
+            
+            setTimeout(() => {
+                const lvl = gameState.currentPlayingLevel || 1;
+                const nextLvl = Math.min(50, lvl + 1);
+                const nextInfo = LEVEL_DATA[nextLvl];
+                if (nextInfo) {
+                    document.getElementById('inter-next-title').innerText = `Bölüm ${nextLvl}: ${nextInfo.title}`;
+                    document.getElementById('inter-next-desc').innerText = nextInfo.desc;
+                    document.getElementById('inter-next-target').innerText = nextInfo.targetScore.toLocaleString();
+                    document.getElementById('inter-next-moves').innerText = nextInfo.maxMoves;
+                    document.getElementById('inter-next-preview').style.display = 'block';
+                }
+                document.getElementById('inter-btn-next').style.display = 'block';
+            }, 1200);
+        }
+        
+        function goToNextLevelFromIntermission() {
+            document.getElementById('intermission-screen').style.display = 'none';
+            const lvl = gameState.currentPlayingLevel || 1;
+            if (lvl < 50) gameState.currentPlayingLevel = lvl + 1;
             saveGame();
             startGameplay();
+        }
+        
+        function closeIntermissionToMap() {
+            document.getElementById('intermission-screen').style.display = 'none';
+            openWorldMap();
+        }
+        function playNextLevelDirectly() {
+            screenWipeAndExecute(() => {
+                closeModal('modal-victory');
+                const lvl = gameState.currentPlayingLevel || 1;
+                if (lvl < 50) {
+                    gameState.currentPlayingLevel = lvl + 1;
+                }
+                gameState.energy = 5;
+                saveGame();
+                startGameplay();
+            });
         }
 
         function restartCurrentLevel() {
-            closeModal('modal-defeat');
-            gameState.energy = 5;
-            saveGame();
-            startGameplay();
+            screenWipeAndExecute(() => {
+                closeModal('modal-defeat');
+                gameState.energy = 5;
+                saveGame();
+                startGameplay();
+            });
         }
 
         function nextLevelAndUnlock() {
-            closeModal('modal-victory');
-            openWorldMap();
+            screenWipeAndExecute(() => {
+                closeModal('modal-victory');
+                openWorldMap();
+            });
         }
 
         function openHeroScreen() {
             showScreen('screen-hero');
-            viewHeroTab(gameState.selectedHero || 'asterion');
+            viewHeroTab(gameState.selectedHero || 'arkenya');
         }
 
         function viewHeroTab(heroId) {
@@ -2368,9 +3646,9 @@
         }
 
         function confirmHeroAndGoToMap() {
-            const selectedHeroId = gameState.viewedHero || gameState.selectedHero || 'asterion';
+            const selectedHeroId = gameState.viewedHero || gameState.selectedHero || 'arkenya';
             if (!isHeroUnlocked(selectedHeroId)) {
-                alert("Bu kahraman henüz kilitli! Kilidi açmak için bölümleri geçmeli veya yüksek puan toplamalısınız.");
+                showToast("Bu kahraman henüz kilitli!", "error");
                 return;
             }
             gameState.selectedHero = selectedHeroId;
@@ -2387,30 +3665,301 @@
                 HEROES[gameState.viewedHero].atk += 100;
                 viewHeroTab(gameState.viewedHero);
                 saveGame();
-                alert(`${HEROES[gameState.viewedHero].name} Seviyesi Yükseltildi!`);
+                showToast(`${HEROES[gameState.viewedHero].name} Seviyesi Yükseltildi!`, "success");
             } else {
-                alert("Yetersiz Altın!");
+                showToast("Yetersiz Altın!", "error");
             }
         }
 
+        function openStoreScreen() {
+            showScreen('screen-store');
+            updateStoreUI();
+        }
+
+        function updateStoreUI() {
+            // Because we might call updateStoreUI from anywhere, let's update all potential store-related DOM elements safely
+            const sGold = document.getElementById('store-screen-gold');
+            const sGems = document.getElementById('store-screen-gems');
+            const invZ = document.getElementById('store-screen-inv-zeus');
+            const invA = document.getElementById('store-screen-inv-athena');
+
+            if(sGold) sGold.innerText = gameState.gold.toLocaleString();
+            if(sGems) sGems.innerText = gameState.gems.toLocaleString();
+            if(invZ) invZ.innerText = gameState.inventory.zeus || 0;
+            if(invA) invA.innerText = gameState.inventory.athena || 0;
+        }
+
+        function purchaseIAP(bundleId, price, desc) {
+            document.getElementById('payment-item-name').innerText = desc;
+            document.getElementById('payment-price').innerText = `₺${price}`;
+            
+            const btn = document.getElementById('btn-confirm-payment');
+            // Clean up old event listeners if any (by cloning)
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            
+            newBtn.onclick = () => {
+                newBtn.innerText = "İşleniyor...";
+                newBtn.disabled = true;
+                newBtn.style.opacity = '0.7';
+                
+                setTimeout(() => {
+                    newBtn.innerText = "Başarılı! ✓";
+                    newBtn.style.background = "var(--accent-green)";
+                    
+                    setTimeout(() => {
+                        applyIAPBundle(bundleId);
+                        closeModal('modal-payment');
+                        
+                        // Reset button
+                        newBtn.innerText = "Satın Al (Face ID)";
+                        newBtn.disabled = false;
+                        newBtn.style.opacity = '1';
+                        newBtn.style.background = "#007aff";
+                    }, 1000);
+                }, 1500);
+            };
+
+            openModal('modal-payment');
+        }
+
+        function applyIAPBundle(bundleId) {
+            if(bundleId === 'zeus_bundle') {
+                gameState.gold += 15000;
+                gameState.gems += 250;
+                spawnFloatingCombo("🎁 ZEUS'UN BEREKETİ KAZANILDI!");
+            } else if(bundleId === 'ares_bundle') {
+                gameState.inventory.zeus += 25;
+                gameState.inventory.athena += 25;
+                spawnFloatingCombo("⚔️ ARES'İN ÖFKESİ KAZANILDI!");
+            } else if(bundleId === 'poseidon_bundle') {
+                gameState.energy = Math.min(gameState.maxEnergy, gameState.energy + 30);
+                spawnFloatingCombo("🌊 POSEIDON'UN İKSİRLERİ KAZANILDI!");
+            }
+            saveGame();
+            updateTopBar();
+            updateStoreUI();
+        }
+
+        function buyItem(itemId, cost, currencyType) {
+            if (currencyType === 'gold') {
+                if (gameState.gold < cost) {
+                    showToast("Yeterli altının yok!", "error");
+                    return;
+                }
+                gameState.gold -= cost;
+            } else if (currencyType === 'gems') {
+                if (gameState.gems < cost) {
+                    showToast("Yeterli elmasın yok!", "error");
+                    return;
+                }
+                gameState.gems -= cost;
+            }
+            
+            if (gameState && gameState.stats) gameState.stats.itemsBought++;
+            
+            if (itemId === 'energy') {
+                if (gameState.energy >= gameState.maxEnergy) {
+                    showToast("Canın zaten dolu!", "info");
+                    // refund
+                    if (currencyType === 'gold') gameState.gold += cost;
+                    if (currencyType === 'gems') gameState.gems += cost;
+                    return;
+                }
+                gameState.energy = gameState.maxEnergy;
+                showToast("Can tamamen dolduruldu! ⚡", "success");
+            } else {
+                if (!gameState.inventory[itemId]) gameState.inventory[itemId] = 0;
+                gameState.inventory[itemId]++;
+                showToast("Satın alma başarılı!", "success");
+            }
+            
+            saveGame();
+            updateTopBar();
+            updateStoreUI();
+            if (document.getElementById('screen-gameplay').classList.contains('active')) {
+                updateGameplayPowerups();
+            }
+        }
+
+        const DAILY_REWARDS = [
+            { day: 1, gold: 500, gems: 0, text: '500 Altın' },
+            { day: 2, gold: 1000, gems: 0, text: '1000 Altın' },
+            { day: 3, gold: 0, gems: 10, text: '10 Elmas' },
+            { day: 4, gold: 1500, gems: 0, text: '1500 Altın' },
+            { day: 5, gold: 0, gems: 20, text: '20 Elmas' },
+            { day: 6, gold: 2000, gems: 0, text: '2000 Altın' },
+            { day: 7, gold: 5000, gems: 50, text: 'Devasa Kutu' }
+        ];
+        
+        let pendingDailyReward = null;
+
+        function checkDailyReward() {
+            const today = new Date().toDateString();
+            if (gameState.lastLoginDate !== today) {
+                // New day!
+                gameState.lastLoginDate = today;
+                gameState.loginStreak = (gameState.loginStreak || 0) + 1;
+                if(gameState.loginStreak > 7) gameState.loginStreak = 1;
+                saveGame();
+                
+                pendingDailyReward = DAILY_REWARDS[gameState.loginStreak - 1];
+                
+                const grid = document.getElementById('daily-reward-days');
+                grid.innerHTML = '';
+                
+                DAILY_REWARDS.forEach(r => {
+                    let isToday = r.day === gameState.loginStreak;
+                    let isPast = r.day < gameState.loginStreak;
+                    
+                    let bg = isToday ? 'var(--gold-primary)' : (isPast ? '#444' : '#222');
+                    let col = isToday ? '#000' : (isPast ? '#888' : '#aaa');
+                    let border = isToday ? 'border: 2px solid #fff;' : 'border: 1px solid #333;';
+                    
+                    grid.innerHTML += `
+                        <div style="background: ${bg}; color: ${col}; ${border} border-radius: 8px; padding: 10px; text-align: center; font-size: 11px;">
+                            <div style="font-weight: bold; margin-bottom: 5px;">Gün ${r.day}</div>
+                            <div>${r.text}</div>
+                        </div>
+                    `;
+                });
+                
+                document.getElementById('modal-daily-reward').classList.add('active');
+            }
+        }
+
+        function claimDailyReward() {
+            if(pendingDailyReward) {
+                if(pendingDailyReward.gold) gameState.gold += pendingDailyReward.gold;
+                if(pendingDailyReward.gems) gameState.gems += pendingDailyReward.gems;
+                saveGame();
+                updateHUD();
+                showToast("Günlük Ödül Alındı!", "success");
+            }
+            closeModal('modal-daily-reward');
+        }
+
+        const DAILY_QUESTS = [
+            { id: 'q1', title: 'Mitolojik Yıkım', desc: 'Oyunda 100 kırmızı taş patlat', target: 100, reward: { gems: 5 }, type: 'gemsBroken' },
+            { id: 'q2', title: 'İlahi Güç', desc: 'Özel yeteneğini 3 kez kullan', target: 3, reward: { gold: 500 }, type: 'powersUsed' },
+            { id: 'q3', title: 'Tüccar', desc: 'Mağazadan 1 eşya satın al', target: 1, reward: { gems: 10 }, type: 'itemsBought' }
+        ];
+
+        function openQuestsModal() {
+            const listEl = document.getElementById('quests-list');
+            listEl.innerHTML = '';
+            
+            DAILY_QUESTS.forEach(q => {
+                let current = 0;
+                if(q.type === 'gemsBroken') current = gameState.stats.totalGemsBroken;
+                if(q.type === 'powersUsed') current = gameState.stats.powersUsed;
+                if(q.type === 'itemsBought') current = gameState.stats.itemsBought;
+                
+                let progress = Math.min(100, (current / q.target) * 100);
+                let isComplete = current >= q.target;
+                let isClaimed = gameState.stats.questsClaimed && gameState.stats.questsClaimed[q.id];
+                
+                let btnHTML = '';
+                if(isClaimed) {
+                    btnHTML = `<button disabled style="background: #333; color: #777; padding: 5px 10px; border-radius: 4px; border: none; font-size: 11px;">ALINDI</button>`;
+                } else if(isComplete) {
+                    btnHTML = `<button onclick="claimQuest('${q.id}')" style="background: var(--gold-primary); color: #000; padding: 5px 10px; border-radius: 4px; border: none; font-weight: bold; font-size: 11px; cursor: pointer;">AL</button>`;
+                } else {
+                    btnHTML = `<div style="font-size: 10px; color: #aaa;">${current}/${q.target}</div>`;
+                }
+
+                let rewardStr = q.reward.gems ? `💎 ${q.reward.gems}` : `🪙 ${q.reward.gold}`;
+
+                listEl.innerHTML += `
+                    <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; display: flex; align-items: center; justify-content: space-between;">
+                        <div style="flex: 1; text-align: left;">
+                            <div style="font-weight: bold; font-size: 13px; color: #fff;">${q.title}</div>
+                            <div style="font-size: 10px; color: #aaa; margin-top: 2px;">${q.desc}</div>
+                            
+                            <!-- Progress Bar -->
+                            <div style="width: 100%; background: #222; height: 6px; border-radius: 3px; margin-top: 6px; overflow: hidden;">
+                                <div style="width: ${progress}%; background: var(--gold-primary); height: 100%;"></div>
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 5px; margin-left: 15px; min-width: 50px;">
+                            <div style="font-size: 12px; font-weight: bold; color: var(--gold-light);">${rewardStr}</div>
+                            ${btnHTML}
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('modal-quests').classList.add('active');
+        }
+
+        function claimQuest(questId) {
+            const q = DAILY_QUESTS.find(x => x.id === questId);
+            if(!q) return;
+            
+            if(!gameState.stats.questsClaimed) gameState.stats.questsClaimed = {};
+            gameState.stats.questsClaimed[questId] = true;
+            
+            if(q.reward.gems) gameState.gems += q.reward.gems;
+            if(q.reward.gold) gameState.gold += q.reward.gold;
+            
+            saveGame();
+            updateHUD();
+            showToast("Ödül Alındı!", "success");
+            openQuestsModal(); // refresh UI
+        }
+
         function openLeaderboardModal() {
-            document.getElementById('lb-player-score').innerText = gameState.gold.toLocaleString();
+            // Note: lb-player-score doesn't exist anymore, skipping
             document.getElementById('modal-leaderboard').classList.add('active');
-            fetchLeaderboard();
+            loadLeaderboard('haftalik');
         }
 
         function buyOffer(gems, gold) {
             gameState.gems += gems;
             gameState.gold += gold;
             saveGame();
-            alert(`Satın Alma Başarılı! +${gems} Elmas ve +${gold} Altın Hesabınıza Eklendi.`);
+            showToast(`Satın Alma Başarılı! +${gems} Elmas ve +${gold} Altın Hesabınıza Eklendi.`, "success");
         }
 
         function buyEnergyFull() {
-            gameState.energy = gameState.maxEnergy;
-            saveGame();
-            alert("Canlarınız Tamamen Dolduruldu!");
+            if (gameState.gems >= 50) {
+                gameState.gems -= 50;
+                gameState.energy = gameState.maxEnergy;
+                gameState.lastLifeLossTime = null;
+                saveGame();
+                showToast("Canlarınız Tamamen Dolduruldu!", "success");
+                updateHUD();
+            } else {
+                showToast("Yeterli elmasın yok! Lütfen mağazadan elmas satın al.", "error");
+            }
         }
+
+        function buyFullLives() {
+            buyEnergyFull();
+            closeModal('modal-out-of-lives');
+        }
+
+        setTimeout(() => {
+            checkDailyReward();
+        }, 500);
+
+        // Android Hardware Back Button Integration
+        document.addEventListener('backbutton', function (e) {
+            e.preventDefault();
+            const activeModal = document.querySelector('.modal-overlay.active');
+            if (activeModal) {
+                activeModal.classList.remove('active');
+                return;
+            }
+            const currentScreen = document.querySelector('.screen.active');
+            if (currentScreen) {
+                if (currentScreen.id === 'screen-gameplay') {
+                    openWorldMap();
+                } else if (currentScreen.id === 'screen-worldmap' || currentScreen.id === 'screen-hero') {
+                    showScreen('screen-mainmenu');
+                }
+            }
+        }, false);
     </script>
 </body>
 </html>

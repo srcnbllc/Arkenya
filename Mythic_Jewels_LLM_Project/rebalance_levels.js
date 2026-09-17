@@ -1,37 +1,55 @@
 const fs = require('fs');
 
-let html = fs.readFileSync('index.html', 'utf8');
+let html = fs.readFileSync('www/index.html', 'utf8');
 
 const regex = /const LEVEL_DATA = {([\s\S]*?)};\n/m;
 const match = html.match(regex);
 if(match) {
     let block = match[1];
-    
     let newBlock = '';
     const lines = block.split('\n');
+    
     for(let line of lines) {
         if(!line.trim()) continue;
-        let lvlMatch = line.match(/^(\s*)(\d+):\s*{(.*)targetScore:\s*(\d+),\s*maxMoves:\s*(\d+)\s*},?/);
+        let lvlMatch = line.match(/^(\s*)(\d+):\s*{(.*?)targetScore:\s*(\d+),\s*maxMoves:\s*(\d+)\s*},?/);
         if(lvlMatch) {
             let space = lvlMatch[1];
             let lvl = parseInt(lvlMatch[2]);
             let rest = lvlMatch[3];
             
-            let rawScore = 5000 + (lvl - 1) * 1122.4489;
-            let newScore = Math.round(rawScore / 250) * 250; 
+            // Base score progression (e.g. 5000 to 80000)
+            let baseScore = 5000 + (lvl * 1500); 
+            let scoreFluctuation = (Math.sin(lvl * 1.5) * 1000); // Rollercoaster
             
-            let newMoves = Math.round(35 - (lvl - 1) * 0.3061);
+            let finalScore = baseScore + scoreFluctuation;
             
-            newBlock += `${space}${lvl}: {${rest}targetScore: ${newScore}, maxMoves: ${newMoves} },\n`;
+            // Bosses are spikes
+            if (lvl % 10 === 0) {
+                finalScore += 5000;
+            }
+            
+            finalScore = Math.round(finalScore / 250) * 250;
+            
+            // Moves progression (35 down to 18)
+            let baseMoves = 35 - (lvl * 0.35);
+            let moveFluctuation = (Math.cos(lvl * 1.5) * 2);
+            let finalMoves = Math.round(baseMoves + moveFluctuation);
+            
+            if (lvl % 10 === 0) {
+                finalMoves -= 3; // Bosses have less moves
+            }
+            
+            finalMoves = Math.max(15, finalMoves); // Cap minimum moves
+            
+            newBlock += `${space}${lvl}: {${rest}targetScore: ${finalScore}, maxMoves: ${finalMoves} },\n`;
         } else {
             newBlock += line + '\n';
         }
     }
     
     let newHtml = html.replace(regex, `const LEVEL_DATA = {\n${newBlock}};\n`);
-    fs.writeFileSync('index.html', newHtml);
-    fs.writeFileSync('Arkenya_Playable_Demo.html', newHtml);
-    console.log("SUCCESS");
+    fs.writeFileSync('www/index.html', newHtml);
+    console.log("SUCCESSFULLY REBALANCED LEVELS!");
 } else {
     console.log("ERROR: LEVEL_DATA not found");
 }
