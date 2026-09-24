@@ -25,6 +25,9 @@ Ads should be age-appropriate and integrated through compliant SDKs. Rewarded ad
 
 ## Privacy
 Collect minimum necessary data. Privacy policy, consent and regional requirements must be reviewed before release.
+- **Canlı Gizlilik ve Güvenlik URL'si:** https://sites.google.com/view/arkenya/ana-sayfa
+- **Geliştirici:** Solo Byte Studios
+- **İletişim:** sercan.balluca@gmail.com
 
 ## Age rating
 Complete current Google Play and Apple age-rating questionnaires truthfully based on the final build.

@@ -8,9 +8,14 @@
   "main": "fix_arkenya.js",
   "dependencies": {
     "@capacitor/android": "^8.5.2",
+    "@capacitor/app": "^8.1.1",
     "@capacitor/cli": "^8.5.2",
     "@capacitor/core": "^8.5.2",
+    "@capacitor/haptics": "^8.0.2",
     "@capacitor/ios": "^8.5.2",
+    "@capacitor/screen-orientation": "^8.0.1",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.3",
     "bidi-js": "^1.1.0",
     "css-tree": "^3.2.1",
     "data-urls": "^7.0.0",
@@ -39,7 +44,14 @@
     "xmlchars": "^2.2.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test_user_enhancements.js && node test_performance_and_resilience.js && node test_cinematic_narrator.js",
+    "sync": "npx cap sync",
+    "sync:android": "npx cap sync android",
+    "sync:ios": "npx cap sync ios",
+    "build:apk": "cd android && gradlew.bat assembleDebug",
+    "build:bundle": "cd android && gradlew.bat bundleRelease",
+    "open:android": "npx cap open android",
+    "open:ios": "npx cap open ios"
   },
   "keywords": [],
   "author": "",

@@ -1,4 +1,29 @@
+# Node dependencies
 node_modules/
-android/
+**/node_modules/
+
+# Android / Gradle build caches & outputs
+.gradle/
+**/.gradle/
+build/
+**/build/
+local.properties
+**/local.properties
+.cxx/
+**/.cxx/
+Captures/
+**/Captures/
+
+# IDE files
+.idea/
+**/.idea/
+.vscode/
+**/.vscode/
+*.iml
+**/*.iml
+
+# System files
 .DS_Store
+Thumbs.db
+*.log
 node-v*/

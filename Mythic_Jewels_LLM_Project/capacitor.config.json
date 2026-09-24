@@ -1,5 +1,34 @@
 {
   "appId": "com.mythic.jewels",
-  "appName": "Mythic Jewels",
-  "webDir": "www"
+  "appName": "Arkenya: Mythic Jewels",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "backgroundColor": "#04060a",
+  "android": {
+    "allowMixedContent": true,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": true
+  },
+  "ios": {
+    "contentInset": "automatic",
+    "allowsLinkPreview": false,
+    "scrollEnabled": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1500,
+      "launchAutoHide": true,
+      "backgroundColor": "#04060a",
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "overlay": true
+    },
+    "ScreenOrientation": {
+      "orientation": "portrait"
+    }
+  }
 }
