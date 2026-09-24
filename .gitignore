@@ -1,0 +1,29 @@
+# Node dependencies
+node_modules/
+**/node_modules/
+package-lock.json
+
+# IDE & Editor caches
+.idea/
+**/.idea/
+.vscode/
+**/.vscode/
+*.iml
+**/*.iml
+
+# Android build outputs & local config
+.gradle/
+**/.gradle/
+build/
+**/build/
+local.properties
+**/local.properties
+.cxx/
+**/.cxx/
+Captures/
+**/Captures/
+
+# OS files
+.DS_Store
+Thumbs.db
+*.log

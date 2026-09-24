@@ -1,0 +1,18 @@
+{
+    "name": "MythicJewels.Gameplay",
+    "rootNamespace": "MythicJewels.Gameplay",
+    "references": [
+        "MythicJewels.Core",
+        "MythicJewels.Persistence",
+        "MythicJewels.Economy"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
