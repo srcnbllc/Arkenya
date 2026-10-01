@@ -28,7 +28,7 @@
       "overlay": true
     },
     "ScreenOrientation": {
-      "orientation": "portrait"
+      "orientation": "unspecified"
     }
   }
 }

@@ -9,7 +9,9 @@ const targets = [
     'Arkenya_Playable_Demo.html',
     'www/Arkenya_Playable_Demo.html',
     'android/app/src/main/assets/public/index.html',
-    'android/app/src/main/assets/public/Arkenya_Playable_Demo.html'
+    'android/app/src/main/assets/public/Arkenya_Playable_Demo.html',
+    'ios/App/App/public/index.html',
+    'ios/App/App/public/Arkenya_Playable_Demo.html'
 ];
 
 function getHash(filePath) {
@@ -24,7 +26,7 @@ console.log(`Source [${sourcePath}] SHA-256: ${sourceHash} (${sourceData.length}
 let allMatched = true;
 
 targets.forEach(tgt => {
-    if (fs.existsSync(tgt) || tgt.startsWith('android/')) {
+    if (fs.existsSync(tgt) || tgt.startsWith('android/') || tgt.startsWith('ios/')) {
         const dir = require('path').dirname(tgt);
         if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
         fs.writeFileSync(tgt, sourceData);

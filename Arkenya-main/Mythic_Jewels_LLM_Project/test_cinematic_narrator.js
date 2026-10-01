@@ -162,6 +162,7 @@ console.log(`=============================================================`);
 
 if (passed === total) {
     console.log(">>> ALL CINEMATIC NARRATOR TESTS PASSED! <<<");
+    process.exit(0);
 } else {
     process.exit(1);
 }

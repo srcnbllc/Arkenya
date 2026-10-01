@@ -47,8 +47,8 @@ assert.strictEqual(activeHearts5.length, 5, 'All 5 hearts must be active when en
 assert.strictEqual(fadedHearts5.length, 0, 'Zero hearts must be faded when energy is 5');
 
 const timerEl5 = document.getElementById('hud-game-energy-timer');
-assert.strictEqual(timerEl5.innerText, 'DOLU', 'Timer label must show DOLU when full');
-console.log('✅ TEST 2 PASSED: 5 active glowing hearts rendered when energy is full.');
+assert.strictEqual(timerEl5.style.display, 'none', 'Timer label must be hidden (display: none) when full 5 energy');
+console.log('✅ TEST 2 PASSED: 5 active glowing hearts rendered & timer hidden when energy is full.');
 
 // 4. Test Partial Lives (energy = 3)
 run('gameState.energy = 3; renderAllHeartsAndTimers("28:40");');
@@ -59,6 +59,7 @@ assert.strictEqual(activeHearts3.length, 3, 'Exactly 3 hearts must be active whe
 assert.strictEqual(fadedHearts3.length, 2, 'Exactly 2 hearts must be faded when energy is 3');
 
 const timerEl3 = document.getElementById('hud-game-energy-timer');
+assert.strictEqual(timerEl3.style.display, 'block', 'Timer label must be visible (display: block) when energy < 5');
 assert(timerEl3.innerText.includes('28:40'), 'Timer label must show countdown when energy < 5');
 console.log('✅ TEST 3 PASSED: Dynamic heart fading and live countdown timer verified.');
 

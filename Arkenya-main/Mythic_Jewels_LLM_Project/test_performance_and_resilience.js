@@ -38,6 +38,9 @@ assert(modalPause && !modalPause.classList.contains('active'), 'Pause modal clos
 assert(run("typeof window.AdGuard === 'object'"), 'window.AdGuard is defined');
 assert(run("typeof window.AdGuard.prepareForAd === 'function'"), 'window.AdGuard.prepareForAd is defined');
 assert(run("typeof window.AdGuard.onAdClosed === 'function'"), 'window.AdGuard.onAdClosed is defined');
+assert(run("window.AdGuard.adUnitIds.rewarded.android === 'ca-app-pub-5447184164278795/1119736397'"), 'AdGuard.adUnitIds.rewarded.android matches production ID');
+assert(run("window.AdGuard.adUnitIds.rewardedExtraMove.android === 'ca-app-pub-5447184164278795/3554328047'"), 'AdGuard.adUnitIds.rewardedExtraMove.android matches production ID');
+assert(run("window.AdGuard.adUnitIds.rewardedCoins.android === 'ca-app-pub-5447184164278795/1127560974'"), 'AdGuard.adUnitIds.rewardedCoins.android matches production ID');
 
 run("window.AdGuard.prepareForAd('rewarded');");
 assert(run("window.AdGuard.isAdActive === true"), 'AdGuard.isAdActive is true during ad');

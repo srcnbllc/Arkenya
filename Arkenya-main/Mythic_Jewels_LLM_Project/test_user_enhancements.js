@@ -92,14 +92,14 @@ win.eval(`
 `);
 const btnAbility = doc.getElementById('btn-use-ability');
 assert(btnAbility && btnAbility.disabled === true, "Level 1: Hero Ability button is disabled/locked");
-assert(btnAbility && btnAbility.innerText.includes('4. BÖLÜMDE'), "Level 1: Hero Ability button indicates unlock at Level 4");
+assert(btnAbility && btnAbility.innerText.includes('5. BÖLÜMDE'), "Level 1: Hero Ability button indicates unlock at Level 5");
 
-// Level 4 Gameplay start: check ability unlocks
+// Level 5 Gameplay start: check ability unlocks
 win.eval(`
-    gameState.currentPlayingLevel = 4;
+    gameState.currentPlayingLevel = 5;
     startGameplayCore();
 `);
-assert(btnAbility && btnAbility.innerText === 'YETENEK KULLAN', "Level 4: Hero Ability button unlocks with 'YETENEK KULLAN'");
+assert(btnAbility && btnAbility.innerText === 'YETENEK KULLAN', "Level 5: Hero Ability button unlocks with 'YETENEK KULLAN'");
 
 // Level 5 Tutorial check
 win.eval(`

@@ -27,3 +27,7 @@ Captures/
 .DS_Store
 Thumbs.db
 *.log
+
+# Scratch & temporary workspace files
+scratch/
+**/scratch/
