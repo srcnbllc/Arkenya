@@ -27,12 +27,12 @@ const { window } = dom;
 const { document } = window;
 const run = (code) => window.eval(code);
 
-// 1. Simulate an old save that had Athena 2x, Hermes 2x, Ares 1x
-console.log('Simulating legacy state with old boosters on Level 1...');
+// 1. Simulate Level 1: Clean dock (pure swipe mechanics, zero unearned boosters)
+console.log('Verifying Level 1 clean dock (pure swipe tutorial)...');
 run(`
     gameState.unlockedLevel = 1;
     gameState.currentPlayingLevel = 1;
-    gameState.inventory = { zeus: 1, athena: 2, hermes: 2, ares: 1, energy: 0 };
+    gameState.inventory = { zeus: 0, athena: 0, hermes: 0, ares: 0, energy: 0 };
     updateGameplayPowerups();
 `);
 
@@ -40,18 +40,23 @@ const dock = document.getElementById('gameplay-booster-vertical-dock');
 assert(dock, 'Gameplay booster dock must exist');
 const renderedBoostersLvl1 = dock.querySelectorAll('.mythic-dock-booster-btn');
 console.log('Rendered boosters on Level 1:', renderedBoostersLvl1.length);
+assert.strictEqual(renderedBoostersLvl1.length, 0, 'Level 1 must have 0 boosters for pure swiping focus');
+console.log('✅ TEST 1 PASSED: Level 1 clean dock verified (no booster distractions).');
 
-assert.strictEqual(renderedBoostersLvl1.length, 1, 'Only 1 booster must be rendered on Level 1 (Zeus trial)');
+// 2. Test Level 2 single trial booster grant and usage
+console.log('Verifying Level 2 trial booster grant (Zeus trial)...');
+run(`
+    gameState.unlockedLevel = 2;
+    gameState.currentPlayingLevel = 2;
+    updateGameplayPowerups();
+`);
+const renderedBoostersLvl2 = dock.querySelectorAll('.mythic-dock-booster-btn');
+console.log('Rendered boosters on Level 2:', renderedBoostersLvl2.length);
+assert.strictEqual(renderedBoostersLvl2.length, 1, 'Only 1 booster must be rendered on Level 2 (Zeus trial)');
 const zeusBtn = document.getElementById('dock-booster-zeus');
-assert(zeusBtn, 'Zeus booster must be the only one present');
-assert(zeusBtn.innerHTML.includes('DENEME'), 'Zeus must have DENEME badge on Level 1');
+assert(zeusBtn, 'Zeus booster must be present as trial');
+assert(zeusBtn.innerHTML.includes('DENEME'), 'Zeus must have DENEME badge on Level 2');
 
-assert.strictEqual(document.getElementById('dock-booster-athena'), null, 'Athena must NOT be rendered on Level 1');
-assert.strictEqual(document.getElementById('dock-booster-hermes'), null, 'Hermes must NOT be rendered on Level 1');
-assert.strictEqual(document.getElementById('dock-booster-ares'), null, 'Ares must NOT be rendered on Level 1');
-console.log('✅ TEST 1 PASSED: Strict Level 1 isolation enforced! Athena, Hermes, Ares completely blocked from Level 1.');
-
-// 2. Test using the Zeus trial booster on Level 1 -> Dock becomes completely empty
 run('initGrid(); usePowerup("zeus");');
 const boostersAfterUse = dock.querySelectorAll('.mythic-dock-booster-btn');
 console.log('Rendered boosters after using trial booster:', boostersAfterUse.length);

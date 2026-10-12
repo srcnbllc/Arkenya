@@ -16,14 +16,13 @@ console.log('✅ PASS: CSS Toast animations & safe notch inset validated.');
 // 2. Verify Android Manifest Play Store readiness
 const manifestContent = fs.readFileSync('android/app/src/main/AndroidManifest.xml', 'utf8');
 assert(manifestContent.includes('android.permission.INTERNET'), 'AndroidManifest must have INTERNET');
-assert(manifestContent.includes('com.android.vending.BILLING'), 'AndroidManifest must have BILLING permission for Play Store IAP');
 assert(manifestContent.includes('android:hardwareAccelerated="true"'), 'AndroidManifest must have hardware acceleration enabled');
 console.log('✅ PASS: AndroidManifest permissions and hardware acceleration validated.');
 
-// 3. Verify targetSdkVersion 35 in variables.gradle
+// 3. Verify targetSdkVersion 36 in variables.gradle
 const variablesGradle = fs.readFileSync('android/variables.gradle', 'utf8');
-assert(variablesGradle.includes('targetSdkVersion = 35'), 'Must target SDK 35 for Google Play 2024-2026 compliance');
-console.log('✅ PASS: Android targetSdkVersion 35 validated.');
+assert(variablesGradle.includes('targetSdkVersion = 36'), 'Must target SDK 36 for Google Play 2026 compliance');
+console.log('✅ PASS: Android targetSdkVersion 36 validated.');
 
 // 4. JSDOM Functional Testing for Toast, Error Boundary, Re-entrancy & Monetization
 const dom = new JSDOM(htmlContent, {

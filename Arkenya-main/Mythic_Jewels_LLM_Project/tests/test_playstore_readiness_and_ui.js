@@ -120,7 +120,7 @@ assert(manifestXml.includes('android:screenOrientation="unspecified"'), 'Android
 const capConfig = JSON.parse(fs.readFileSync('capacitor.config.json', 'utf8'));
 assert(capConfig.plugins.ScreenOrientation.orientation === 'unspecified', 'Capacitor orientation is unspecified (responsive on all devices)');
 
-assert(html.includes('arkenya-c7c61'), 'Firebase Firestore project ID is properly configured');
+assert(html.includes('OLYMPUS_RIVALS_POOL') && html.includes('getSimulatedLeagueParticipants'), 'Manager-Style Simulated League Engine is properly configured');
 assert(html.includes('window.AdGuard'), 'AdGuard AdMob architecture is properly implemented');
 
 console.log(`\n=============================================================`);

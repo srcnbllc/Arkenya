@@ -30,4 +30,18 @@ public class MainActivity extends BridgeActivity {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        try {
+            WebView webView = getBridge().getWebView();
+            if (webView != null) {
+                webView.evaluateJavascript("if (typeof handleNativeBackAction === 'function') { handleNativeBackAction(); }", null);
+                return;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        super.onBackPressed();
+    }
 }

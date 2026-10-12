@@ -5,9 +5,9 @@
   "bundledWebRuntime": false,
   "backgroundColor": "#04060a",
   "android": {
-    "allowMixedContent": true,
+    "allowMixedContent": false,
     "captureInput": true,
-    "webContentsDebuggingEnabled": true
+    "webContentsDebuggingEnabled": false
   },
   "ios": {
     "contentInset": "automatic",

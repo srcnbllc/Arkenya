@@ -69,13 +69,13 @@ async function testAll() {
     if (!boosterDock) throw new Error("Booster vertical dock missing in gameplay screen!");
 
     // Set level and inventory
-    run('gameState.currentPlayingLevel = 3; gameState.inventory = { zeus: 2, athena: 1, hermes: 0 };');
+    run('gameState.currentPlayingLevel = 5; gameState.inventory = { zeus: 2, athena: 1, hermes: 0 };');
     run('updateGameplayPowerups()');
 
     const badgeTitle = document.getElementById('gameplay-level-badge-title').innerText;
     const badgeNext = document.getElementById('gameplay-level-badge-next').innerText;
     console.log("Level Badge:", badgeTitle, "|", badgeNext);
-    if (!badgeTitle.includes('3')) throw new Error("Level badge did not reflect level 3!");
+    if (!badgeTitle.includes('5')) throw new Error("Level badge did not reflect level 5!");
 
     // Check rendered boosters in dock
     console.log("Booster dock children count:", boosterDock.children.length);
@@ -99,6 +99,7 @@ async function testAll() {
     console.log("\n=======================================================");
     console.log("=== ALL STORE, CURRENCY & GAMEPLAY DOCK TESTS PASSED ===");
     console.log("=======================================================");
+    process.exit(0);
 }
 
 testAll().catch(e => {
