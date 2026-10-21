@@ -18,6 +18,7 @@
             android:launchMode="singleTask"
             android:screenOrientation="unspecified"
             android:windowSoftInputMode="adjustPan"
+            android:hardwareAccelerated="true"
             android:exported="true">
 
             <intent-filter>

@@ -1,6 +1,7 @@
 package com.mythic.jewels;
 
 import android.os.Bundle;
+import android.view.View;
 import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -19,6 +20,7 @@ public class MainActivity extends BridgeActivity {
         try {
             WebView webView = getBridge().getWebView();
             if (webView != null) {
+                webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
                 WebSettings settings = webView.getSettings();
                 settings.setMediaPlaybackRequiresUserGesture(false);
                 settings.setAllowFileAccess(true);

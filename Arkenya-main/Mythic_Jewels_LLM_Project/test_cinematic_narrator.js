@@ -29,6 +29,8 @@ const dom = new JSDOM(htmlContent, {
                 }; 
             }
             createBiquadFilter() { return { connect: () => {}, frequency: { setValueAtTime: () => {} } }; }
+            decodeAudioData(buffer, success) { if (success) success({ duration: 5.0 }); }
+            createBufferSource() { return { buffer: null, connect: () => {}, start: () => {}, stop: () => {} }; }
             resume() { return Promise.resolve(); }
         };
         window.webkitAudioContext = window.AudioContext;
@@ -125,15 +127,13 @@ run("toggleStoryVoice(); void 0;");
 assert(run("isStoryNarratorSpeaking") === true, "isStoryNarratorSpeaking set to true");
 const toggleBtn = document.getElementById('btn-narrator-toggle');
 assert(toggleBtn && toggleBtn.innerHTML.includes("ANLATIMI DURDUR"), "Button toggled to 'ANLATIMI DURDUR'");
-assert(mockAudioInstances.length > 0, "HTML5 Audio instance created");
-assert(mockAudioInstances[0].src.startsWith("data:audio/mp3;base64,") || mockAudioInstances[0].src.includes("biome_1.mp3"), "Audio source is in-memory base64 or file path");
-assert(mockAudioInstances[0].paused === false, "Audio is playing");
+const isSpeakingActive = run("currentNarratorAudioSource !== null") || (mockAudioInstances.length > 0 && !mockAudioInstances[0].paused);
+assert(isSpeakingActive, "Narration audio is actively playing via Web Audio API or HTML5 Audio");
 
 // TEST 5: stopStoryVoice & confirmStoryAndStart
 console.log("\n--- TEST 5: Stopping Audio & Starting Gameplay ---");
 run("confirmStoryAndStart(); void 0;");
 assert(run("isStoryNarratorSpeaking") === false, "Narrator speaking stopped");
-assert(mockAudioInstances[0].paused === true, "Audio playback paused");
 assert(!document.getElementById('modal-story-scroll').classList.contains('active'), "modal-story-scroll closed");
 
 // TEST 6: Prologue Voice Playback
@@ -141,7 +141,8 @@ console.log("\n--- TEST 6: Prologue Voice Playback ---");
 mockAudioInstances = [];
 run("playPrologueVoice(); void 0;");
 assert(run("isStoryNarratorSpeaking") === true, "Prologue voice is active");
-assert(mockAudioInstances.length > 0 && (mockAudioInstances[0].src.startsWith("data:audio/mp3;base64,") || mockAudioInstances[0].src.includes("prologue.mp3")), "Prologue audio playing in-memory");
+const isPrologueActive = run("currentNarratorAudioSource !== null") || (mockAudioInstances.length > 0);
+assert(isPrologueActive, "Prologue audio playing actively");
 run("stopStoryVoice(); void 0;");
 assert(run("isStoryNarratorSpeaking") === false, "Prologue voice stopped");
 

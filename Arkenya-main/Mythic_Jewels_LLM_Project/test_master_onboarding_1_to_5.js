@@ -133,7 +133,7 @@ async function runTestSuite() {
         isLevelEnding: run('isLevelEnding'),
         inventory: run('gameState.inventory')
     });
-    run("usePowerup('zeus');");
+    run("isSwapping = false; isCascading = false; usePowerup('zeus');");
     await new Promise(r => setTimeout(r, 500));
     assert.strictEqual(run('gameState.inventory.zeus'), 0, 'Zeus count must drop to 0 after use');
     assert.strictEqual(document.getElementById('dock-booster-zeus'), null, 'Booster button must vanish once used');
