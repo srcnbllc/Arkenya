@@ -4,7 +4,7 @@
   },
   "name": "mythic_jewels_llm_project",
   "description": "Bu klasör, Android ve iOS için geliştirilecek **Mythic Jewels** adlı özgün, oyun içi sanal ekonomi kullanan, gerçek para bahis/kumar içermeyen, fantastik Match-3 + macera + kahraman + boss + hazine + bölüm ilerleme oyununun uçtan uca üretim kaynağıdır.",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "fix_arkenya.js",
   "dependencies": {
     "@capacitor-community/admob": "^8.1.0",

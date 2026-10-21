@@ -12880,7 +12880,59 @@ function openModal(modalId) {
             }
         }
 
-                function showVictory() {
+        function spawnVictoryFlyingRewards(starsCount = 3) {
+            if (typeof document === 'undefined') return;
+            const container = document.getElementById('screen-gameplay') || document.body;
+            const grid = document.getElementById('game-grid');
+            const goldTargetEl = document.getElementById('victory-gold-val') || document.getElementById('hud-gold-count');
+
+            const startX = window.innerWidth / 2;
+            const startY = grid ? (grid.getBoundingClientRect().top + (grid.offsetHeight || 300) / 2) : (window.innerHeight * 0.45);
+            const endX = goldTargetEl ? (goldTargetEl.getBoundingClientRect().left + 20) : (window.innerWidth * 0.5);
+            const endY = goldTargetEl ? (goldTargetEl.getBoundingClientRect().top + 10) : 60;
+
+            const count = Math.min(8, 4 + starsCount * 2);
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    const coin = document.createElement('div');
+                    coin.className = 'flying-reward-coin';
+                    coin.textContent = (i % 3 === 0) ? '⭐' : '🪙';
+                    coin.style.position = 'fixed';
+                    coin.style.left = startX + 'px';
+                    coin.style.top = startY + 'px';
+                    coin.style.fontSize = '22px';
+                    coin.style.zIndex = '99999';
+                    coin.style.pointerEvents = 'none';
+                    coin.style.transform = 'translate3d(-50%, -50%, 0) scale(0.6)';
+                    coin.style.willChange = 'transform, opacity';
+                    container.appendChild(coin);
+
+                    const burstX = (Math.random() - 0.5) * 80;
+                    const burstY = (Math.random() - 0.5) * 60 - 20;
+
+                    if (typeof coin.animate === 'function') {
+                        const anim = coin.animate([
+                            { transform: 'translate3d(-50%, -50%, 0) scale(0.5)', opacity: 0 },
+                            { transform: `translate3d(calc(-50% + ${burstX}px), calc(-50% + ${burstY}px), 0) scale(1.35)`, opacity: 1, offset: 0.2 },
+                            { transform: `translate3d(${endX - startX}px, ${endY - startY}px, 0) scale(0.85)`, opacity: 0.9, offset: 0.85 },
+                            { transform: `translate3d(${endX - startX}px, ${endY - startY}px, 0) scale(0.2)`, opacity: 0 }
+                        ], {
+                            duration: 650,
+                            easing: 'cubic-bezier(0.18, 0.89, 0.32, 1.28)',
+                            fill: 'forwards'
+                        });
+                        anim.onfinish = () => {
+                            if (coin.parentNode) coin.remove();
+                            sfxButtonClick();
+                        };
+                    } else {
+                        setTimeout(() => { if (coin.parentNode) coin.remove(); }, 650);
+                    }
+                }, i * 65);
+            }
+        }
+
+        function showVictory() {
             clearActiveMatchSession();
             document.getElementById('modal-victory').classList.add('active');
             playHeroVoice(gameState.selectedHero, 'victory');
@@ -12931,6 +12983,9 @@ function openModal(modalId) {
             setTimeout(() => { document.getElementById('v-star-1').classList.add('active'); }, 300);
             if (stars >= 2) setTimeout(() => { document.getElementById('v-star-2').classList.add('active'); }, 700);
             if (stars >= 3) setTimeout(() => { document.getElementById('v-star-3').classList.add('active'); }, 1100);
+
+            // Flying rewards juice (Royal Match / Candy Crush gold standard feedback)
+            try { spawnVictoryFlyingRewards(stars); } catch(e) {}
 
             // Calculate rewards
                         // Tiered Fixed Progression Rewards (Candy Crush / Royal Match Gold Standard)
