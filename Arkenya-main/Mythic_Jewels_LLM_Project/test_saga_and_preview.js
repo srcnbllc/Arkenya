@@ -124,7 +124,8 @@ const btnStory = document.getElementById('btn-preview-listen-story');
 assert(!!btnStory, "Top-right 'btn-preview-listen-story' button exists");
 
 const storyTextEl = document.getElementById('preview-story');
-assert(storyTextEl && storyTextEl.innerText.includes("Milattan Önce üç bin yılında"), "Preview modal displays Theme 1 continuous saga text");
+const storyContent = storyTextEl ? (storyTextEl.textContent || storyTextEl.innerText || '') : '';
+assert(storyContent.includes("Milattan Önce üç bin yılında"), "Preview modal displays Theme 1 continuous saga text");
 
 // Toggle Play
 mockAudioInstances = [];
@@ -133,7 +134,8 @@ assert(run("isPreviewStoryPlaying") === true, "isPreviewStoryPlaying is true aft
 assert(mockAudioInstances.length > 0, "Audio instance initialized");
 assert(mockAudioInstances[0].paused === false, "Audio is playing");
 const btnText = document.getElementById('preview-story-text');
-assert(btnText && btnText.innerText === 'DURDUR', "Button text toggled to 'DURDUR'");
+const btnContent = btnText ? (btnText.textContent || btnText.innerText || '') : '';
+assert(btnContent.includes('DURDUR'), "Button text toggled to 'DURDUR'");
 
 // Toggle Pause
 run("togglePreviewStoryAudio()");

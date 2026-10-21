@@ -14018,7 +14018,17 @@ function openModal(modalId) {
             const summaryEl = document.getElementById('payment-items-summary');
 
             if (nameEl) nameEl.innerText = desc;
-            if (priceEl) priceEl.textContent = `${price}`;
+
+            let formattedPrice = `${price}`;
+            if (typeof price === 'number') {
+                formattedPrice = `₺${price.toFixed(2)}`;
+            } else if (typeof price === 'string' && !price.includes('₺') && !isNaN(parseFloat(price))) {
+                formattedPrice = `₺${parseFloat(price).toFixed(2)}`;
+            }
+            if (priceEl) {
+                priceEl.innerText = formattedPrice;
+                priceEl.textContent = formattedPrice;
+            }
             
             if (summaryEl) {
                 if (itemsList && itemsList.length > 0) {
@@ -14793,6 +14803,12 @@ function openModal(modalId) {
             // 1. Ekran farketmeksizin ses donanımı & pil tüketimini hemen askıya al
             if (sharedAudioContext && sharedAudioContext.state === 'running') {
                 try { sharedAudioContext.suspend(); } catch(e) {}
+            }
+            if (typeof isStoryNarratorSpeaking !== 'undefined' && isStoryNarratorSpeaking && typeof stopStoryVoice === 'function') {
+                try { stopStoryVoice(); } catch(e) {}
+            }
+            if (typeof isPreviewStoryPlaying !== 'undefined' && isPreviewStoryPlaying && typeof togglePreviewStoryAudio === 'function') {
+                try { togglePreviewStoryAudio(); } catch(e) {}
             }
             // 2. AdMob reklamı oynatılırken (AdGuard aktifken) oyun ekranının üstüne duraklatma modali AÇMA!
             if (window.AdGuard && window.AdGuard.isAdActive) {
