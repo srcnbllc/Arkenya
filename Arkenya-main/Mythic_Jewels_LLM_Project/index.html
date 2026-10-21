@@ -2597,6 +2597,133 @@
             }
         }
 
+        /* ========================================================
+           MYTHIC BOSS BATTLE HUD & COMBAT VISUALS
+           ======================================================== */
+        .boss-battle-hud {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            max-width: 440px;
+            margin: 4px auto 6px auto;
+            padding: 6px 12px;
+            background: linear-gradient(135deg, rgba(20, 10, 35, 0.95) 0%, rgba(10, 15, 30, 0.95) 100%);
+            border: 1.5px solid #a855f7;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), 0 0 15px rgba(168, 85, 247, 0.35);
+            box-sizing: border-box;
+            position: relative;
+            z-index: 25;
+            transition: all 0.3s ease;
+        }
+
+        .boss-avatar-frame {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #3b0764 0%, #0f172a 100%);
+            border: 2px solid #c084fc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 0 12px rgba(192, 132, 252, 0.6);
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .boss-hit-shake {
+            animation: bossHitShakeAnim 0.35s ease-in-out !important;
+        }
+        @keyframes bossHitShakeAnim {
+            0% { transform: scale(1) translate(0, 0); filter: brightness(1); }
+            20% { transform: scale(1.15) translate(-4px, 2px); filter: brightness(2) drop-shadow(0 0 10px #ef4444); }
+            40% { transform: scale(0.9) translate(4px, -2px); filter: brightness(1.8) drop-shadow(0 0 8px #f59e0b); }
+            60% { transform: scale(1.08) translate(-2px, -1px); filter: brightness(1.4); }
+            80% { transform: scale(0.98) translate(1px, 1px); }
+            100% { transform: scale(1) translate(0, 0); filter: brightness(1); }
+        }
+
+        .boss-battle-hud.boss-enraged {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.85), inset 0 0 15px rgba(239, 68, 68, 0.4) !important;
+            animation: bossEnragedPulse 0.9s infinite alternate ease-in-out !important;
+        }
+        @keyframes bossEnragedPulse {
+            0% { transform: scale(1); filter: brightness(1); }
+            100% { transform: scale(1.02); filter: brightness(1.25); }
+        }
+        .boss-battle-hud.boss-enraged .boss-avatar-frame {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 18px rgba(239, 68, 68, 0.9) !important;
+        }
+
+        .boss-battle-hud.boss-defeated {
+            border-color: #22c55e !important;
+            box-shadow: 0 0 25px rgba(34, 197, 94, 0.8) !important;
+            animation: bossDefeatedAnim 0.8s forwards ease-out !important;
+        }
+        @keyframes bossDefeatedAnim {
+            0% { transform: scale(1); filter: brightness(1.5); }
+            50% { transform: scale(1.08); filter: brightness(2); }
+            100% { transform: scale(1); filter: brightness(1); }
+        }
+
+        .boss-hud-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            min-width: 0;
+        }
+
+        .boss-hud-name-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .boss-name {
+            font-size: 11px;
+            font-weight: 900;
+            color: #f1f5f9;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            text-shadow: 0 0 8px rgba(168, 85, 247, 0.7);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .boss-hp-text {
+            font-size: 10px;
+            font-weight: 800;
+            color: #fca5a5;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.3px;
+        }
+
+        .boss-hp-bar-track {
+            width: 100%;
+            height: 10px;
+            background: rgba(15, 23, 42, 0.85);
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+        }
+
+        .boss-hp-bar-fill {
+            height: 100%;
+            border-radius: 5px;
+            background: linear-gradient(90deg, #ec4899 0%, #ef4444 60%, #dc2626 100%);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.7);
+            transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         /* MAP MILESTONE NODES (EVERY 5 LEVELS) */
         .map-node.milestone-node {
             border: 2px solid #00d2ff !important;
@@ -5074,6 +5201,22 @@
                             <line x1="13" y1="20" x2="21" y2="20" stroke="url(#mythicGoldGrad)" stroke-width="2"/>
                         </svg>
                     </button>
+                </div>
+
+                <!-- MYTHIC BOSS BATTLE HUD (Sadece Boss Bölümlerinde: 10, 20, 30, 40, 50) -->
+                <div class="boss-battle-hud" id="boss-battle-hud" style="display: none;">
+                    <div class="boss-avatar-frame" id="boss-avatar-frame">
+                        <span class="boss-avatar-icon" id="boss-avatar-icon">💀</span>
+                    </div>
+                    <div class="boss-hud-info">
+                        <div class="boss-hud-name-row">
+                            <span class="boss-name" id="boss-hud-name">HADES (YERALTI LORDU)</span>
+                            <span class="boss-hp-text" id="boss-hud-hp-text">42.000 / 42.000 HP</span>
+                        </div>
+                        <div class="boss-hp-bar-track">
+                            <div class="boss-hp-bar-fill" id="boss-hud-hp-fill" style="width: 100%;"></div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="grid-area-wrapper mythic-shrine-altar">
@@ -10000,6 +10143,77 @@ function openModal(modalId) {
             console.warn('Error exposing reactive properties:', e);
         }
 
+        const BOSS_DATA = {
+            10: { name: "HADES (YERALTI LORDU)", icon: "💀", color: "#a855f7" },
+            20: { name: "POSEİDON (DENİZLER HÂKİMİ)", icon: "🌊", color: "#0ea5e9" },
+            30: { name: "ZEUS (GÖKLERİN KRALI)", icon: "⚡", color: "#facc15" },
+            40: { name: "HADES'İN İNTİKAMI", icon: "🔥", color: "#ef4444" },
+            50: { name: "KRONOS (TİTANLARIN KRALI)", icon: "👑", color: "#ec4899" }
+        };
+
+        let lastBossHP = null;
+
+        function setupBossBattleHUD(lvl) {
+            const bossHud = document.getElementById('boss-battle-hud');
+            if (!bossHud) return;
+            const isBoss = (lvl % 10 === 0);
+            if (!isBoss) {
+                bossHud.style.display = 'none';
+                lastBossHP = null;
+                return;
+            }
+            const boss = BOSS_DATA[lvl] || { name: `BOSS BÖLÜM ${lvl}`, icon: "👾", color: "#e11d48" };
+            bossHud.style.display = 'flex';
+            const nameEl = document.getElementById('boss-hud-name');
+            const iconEl = document.getElementById('boss-avatar-icon');
+            const hpTextEl = document.getElementById('boss-hud-hp-text');
+            const hpFillEl = document.getElementById('boss-hud-hp-fill');
+            if (nameEl) nameEl.textContent = boss.name;
+            if (iconEl) iconEl.textContent = boss.icon;
+            if (hpFillEl) {
+                hpFillEl.style.width = '100%';
+                hpFillEl.style.background = `linear-gradient(90deg, ${boss.color} 0%, #e11d48 100%)`;
+            }
+            if (hpTextEl) hpTextEl.textContent = `${gameTarget.toLocaleString()} / ${gameTarget.toLocaleString()} HP`;
+            bossHud.classList.remove('boss-enraged', 'boss-defeated');
+            lastBossHP = gameTarget;
+        }
+
+        function updateBossBattleHUD() {
+            const lvl = gameState.currentPlayingLevel || 1;
+            if (lvl % 10 !== 0) return;
+            const bossHud = document.getElementById('boss-battle-hud');
+            if (!bossHud || bossHud.style.display === 'none') return;
+            const remainingHP = Math.max(0, gameTarget - gameScore);
+            const pct = Math.max(0, Math.min(100, Math.round((remainingHP / gameTarget) * 100)));
+            const hpFill = document.getElementById('boss-hud-hp-fill');
+            const hpText = document.getElementById('boss-hud-hp-text');
+            if (hpFill) hpFill.style.width = `${pct}%`;
+            if (hpText) hpText.textContent = `${remainingHP.toLocaleString()} / ${gameTarget.toLocaleString()} HP`;
+
+            if (lastBossHP !== null && remainingHP < lastBossHP) {
+                triggerBossHitShake();
+            }
+            lastBossHP = remainingHP;
+
+            if (remainingHP === 0) {
+                bossHud.classList.add('boss-defeated');
+                bossHud.classList.remove('boss-enraged');
+            }
+        }
+
+        function triggerBossHitShake() {
+            const lvl = gameState.currentPlayingLevel || 1;
+            if (lvl % 10 !== 0) return;
+            const frame = document.getElementById('boss-avatar-frame');
+            if (frame) {
+                frame.classList.remove('boss-hit-shake');
+                void frame.offsetWidth;
+                frame.classList.add('boss-hit-shake');
+                setTimeout(() => { if (frame) frame.classList.remove('boss-hit-shake'); }, 380);
+            }
+        }
+
         function updateStarProgressBar() {
             const fill = document.getElementById('game-star-progress-fill');
             if (!fill) return;
@@ -10013,6 +10227,10 @@ function openModal(modalId) {
             if (s1) s1.classList.toggle('active', pct >= 50);
             if (s2) s2.classList.toggle('active', pct >= 75);
             if (s3) s3.classList.toggle('active', pct >= 100);
+
+            if (typeof updateBossBattleHUD === 'function') {
+                updateBossBattleHUD();
+            }
         }
 
         function restartFromPause() {
@@ -10113,6 +10331,7 @@ function openModal(modalId) {
             const gameEnergyEl = document.getElementById('game-energy-val');
             if (gameEnergyEl) gameEnergyEl.innerText = gameState.energy;
 
+            if (typeof setupBossBattleHUD === 'function') setupBossBattleHUD(lvl);
             updateStarProgressBar();
 
             const heroKey = (gameState.selectedHero && HEROES[gameState.selectedHero]) ? gameState.selectedHero : 'arkenya';
@@ -12743,6 +12962,19 @@ function openModal(modalId) {
                 el.classList.remove('moves-clutch');
                 if (grid) grid.classList.remove('clutch-warning-pulse');
             }
+
+            // Boss Rage / Enrage Trigger
+            const lvl = gameState.currentPlayingLevel || 1;
+            if (lvl % 10 === 0) {
+                const bossHud = document.getElementById('boss-battle-hud');
+                if (bossHud && bossHud.style.display !== 'none') {
+                    if (gameMoves <= 5 && gameMoves > 0 && typeof gameScore !== 'undefined' && typeof gameTarget !== 'undefined' && gameScore < gameTarget) {
+                        bossHud.classList.add('boss-enraged');
+                    } else if (gameScore >= gameTarget || gameMoves > 5) {
+                        bossHud.classList.remove('boss-enraged');
+                    }
+                }
+            }
         }
 
         // ==========================================
@@ -14244,43 +14476,33 @@ function openModal(modalId) {
 
         // GERÇEK OYUN İÇİ VERİ SETİ İLE ZENGİNLEŞTİRİLMİŞ 7 GÜNLÜK TAPINAK ARMAĞANLARI
         const DAILY_REWARDS = [
-            { day: 1, gold: 40, gems: 0, items: { zeus: 1 }, text: '40 Altın + 1x Şimşek ⚡' },
-            { day: 2, gold: 0, gems: 2, items: { athena: 1 }, text: '2 Elmas + 1x Kalkan 🛡️' },
-            { day: 3, gold: 60, gems: 0, items: { hermes: 1 }, text: '60 Altın + 1x Kasırga 🌪️' },
-            { day: 4, gold: 0, gems: 3, items: { ares: 1 }, text: '3 Elmas + 1x Ares Bombası 💥' },
-            { day: 5, gold: 80, gems: 0, items: { energy: 1 }, text: '80 Altın + 1x Can İksiri 🧪' },
-            { day: 6, gold: 0, gems: 4, items: { zeus: 1 }, text: '4 Elmas + 1x Şimşek ⚡' },
-            { day: 7, gold: 150, gems: 6, items: { zeus: 1, athena: 1 }, text: '👑 150 Altın + 6 Elmas + 2 Güçlendirici' }
+            { day: 1, gold: 50, gems: 0, items: { zeus: 1 }, text: '50 Altın + 1x Şimşek ⚡' },
+            { day: 2, gold: 0, gems: 3, items: { athena: 1 }, text: '3 Elmas + 1x Kalkan 🛡️' },
+            { day: 3, gold: 75, gems: 0, items: { hermes: 1 }, text: '75 Altın + 1x Kasırga 🌪️' },
+            { day: 4, gold: 0, gems: 5, items: { ares: 1 }, text: '5 Elmas + 1x Ares Bombası 💥' },
+            { day: 5, gold: 100, gems: 0, items: { energy: 1 }, text: '100 Altın + 1x Can İksiri 🧪' },
+            { day: 6, gold: 0, gems: 8, items: { zeus: 2 }, text: '8 Elmas + 2x Şimşek ⚡' },
+            { day: 7, gold: 200, gems: 15, items: { zeus: 1, athena: 1, hermes: 1, ares: 1 }, text: '👑 200 Altın + 15 Elmas + 4 Kutsal Güçlendirici' }
         ];
         
         let pendingDailyReward = null;
 
         function checkDailyReward(triggeredFromGameplay = false) {
             const today = new Date().toDateString();
-            
-            // 1. OYUN OYNAMA KONTROLÜ: Günlük ödül sadece o gün en az 1 oyun oynandıktan sonra açılır!
-            const playedToday = (gameState.lastPlayedDay === today && (gameState.stats && gameState.stats.levelsPlayedToday >= 1));
             const alreadyClaimed = (gameState.lastClaimedRewardDay === today);
-
-            if (!playedToday) {
-                if (!triggeredFromGameplay) {
-                    showToast("🔒 Bugünkü Tapınak Ödülünü açmak için en az 1 bölüm oynamalısın! (0/1)", "info");
-                }
-                return;
-            }
-
-            if (alreadyClaimed) {
-                if (!triggeredFromGameplay) {
-                    showToast("Bugünün Tapınak Ödülünü zaten aldın! Yarın yeni ödül açılacak. ✨", "info");
-                }
-                return;
-            }
 
             // Streak hesaplama
             if (gameState.lastLoginDate !== today) {
+                const yesterday = new Date(Date.now() - 86400000).toDateString();
+                if (gameState.lastLoginDate === yesterday) {
+                    gameState.loginStreak = (gameState.loginStreak || 0) + 1;
+                    if (gameState.loginStreak > 7) gameState.loginStreak = 1;
+                } else if (!gameState.lastLoginDate) {
+                    gameState.loginStreak = 1;
+                } else {
+                    gameState.loginStreak = 1;
+                }
                 gameState.lastLoginDate = today;
-                gameState.loginStreak = (gameState.loginStreak || 0) + 1;
-                if (gameState.loginStreak > 7) gameState.loginStreak = 1;
                 saveGame();
             }
 
@@ -14292,7 +14514,7 @@ function openModal(modalId) {
                 grid.innerHTML = '';
                 DAILY_REWARDS.forEach(r => {
                     let isToday = (r.day === currentStreak);
-                    let isPast = (r.day < currentStreak);
+                    let isPast = (r.day < currentStreak) || (isToday && alreadyClaimed);
 
                     let bg = isToday ? 'linear-gradient(135deg, rgba(245,197,66,0.25) 0%, rgba(15,23,42,0.95) 100%)' : (isPast ? '#1e293b' : '#0f172a');
                     let border = isToday ? 'border: 2px solid var(--gold-primary); box-shadow: 0 0 15px rgba(245,197,66,0.4);' : (isPast ? 'border: 1px solid #334155;' : 'border: 1px dashed #334155;');
@@ -14309,8 +14531,15 @@ function openModal(modalId) {
 
             const claimBtn = document.querySelector('#modal-daily-reward .btn-action');
             if (claimBtn) {
-                claimBtn.disabled = false;
-                claimBtn.innerText = `🎁 GÜN ${currentStreak} ÖDÜLÜNÜ AL`;
+                if (alreadyClaimed) {
+                    claimBtn.disabled = true;
+                    claimBtn.innerText = `✓ BUGÜNKÜ ÖDÜLÜ ALDIN (Yarın Yeni Ödül)`;
+                    claimBtn.style.opacity = '0.6';
+                } else {
+                    claimBtn.disabled = false;
+                    claimBtn.innerText = `🎁 GÜN ${currentStreak} ÖDÜLÜNÜ AL`;
+                    claimBtn.style.opacity = '1';
+                }
             }
 
             openModal('modal-daily-reward');
@@ -14318,6 +14547,11 @@ function openModal(modalId) {
 
         function claimDailyReward() {
             const today = new Date().toDateString();
+            if (gameState.lastClaimedRewardDay === today) {
+                showToast("Bugünün ödülünü zaten aldın! ✨", "info");
+                closeModal('modal-daily-reward');
+                return;
+            }
             if (pendingDailyReward) {
                 if (pendingDailyReward.gold) gameState.gold = (gameState.gold || 0) + pendingDailyReward.gold;
                 if (pendingDailyReward.gems) gameState.gems = (gameState.gems || 0) + pendingDailyReward.gems;
@@ -14325,6 +14559,11 @@ function openModal(modalId) {
                     if (!gameState.inventory) gameState.inventory = { zeus: 0, athena: 0, hermes: 0, ares: 0, energy: 0 };
                     for (const k in pendingDailyReward.items) {
                         gameState.inventory[k] = (gameState.inventory[k] || 0) + pendingDailyReward.items[k];
+                    }
+                    if (pendingDailyReward.items.energy) {
+                        gameState.energy = (gameState.maxEnergy || 5);
+                        gameState.energyRegenSecondsRemaining = 1800;
+                        if (typeof renderAllHeartsAndTimers === 'function') renderAllHeartsAndTimers('DOLU');
                     }
                 }
                 gameState.lastClaimedRewardDay = today;
