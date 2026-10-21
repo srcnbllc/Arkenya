@@ -2585,6 +2585,17 @@
             0% { transform: scale(1); filter: brightness(1); }
             100% { transform: scale(1.22); filter: brightness(1.3); }
         }
+        .clutch-warning-pulse {
+            animation: clutchGridPulse 1.2s infinite alternate ease-in-out !important;
+        }
+        @keyframes clutchGridPulse {
+            0% {
+                box-shadow: 0 0 12px rgba(245, 197, 66, 0.4), inset 0 0 10px rgba(231, 76, 60, 0.2);
+            }
+            100% {
+                box-shadow: 0 0 28px rgba(231, 76, 60, 0.85), 0 0 45px rgba(245, 197, 66, 0.5), inset 0 0 20px rgba(231, 76, 60, 0.4);
+            }
+        }
 
         /* MAP MILESTONE NODES (EVERY 5 LEVELS) */
         .map-node.milestone-node {
@@ -8219,11 +8230,11 @@
 
         const LEVEL_DATA = {
             1: { title: "Herkül'ün Uyanışı", desc: "Olimpos'a ilk adım! Taşları kaydırarak 3 aynı taşı yan yana getir.", targetScore: 3500, maxMoves: 20, tip: "👉 Kutuları kaydırarak 3'lü eşleştirme yap!" },
-            2: { title: "Kiklop Mağarası", desc: "İlahi Zeus Şimşeğini kullan ve 4 taşı birleştirerek Yıldırım Kristali yarat!", targetScore: 5000, maxMoves: 20, tip: "⚡ Sağdaki Deneme Şimşeğini kullan & 4'lü eşleştir!" },
-            3: { title: "Minotor'un Labirenti", desc: "T veya L şeklinde 5 taşı eşleştirerek ardışık Kombo ve 3x3 Bomba patlat!", targetScore: 7500, maxMoves: 20, tip: "🔥 T-şeklinde 5 taş eşleştirerek Kombo & Bomba patlat!" },
+            2: { title: "Kiklop Mağarası", desc: "İlahi Zeus Şimşeğini kullan ve 4 taşı birleştirerek Yıldırım Kristali yarat!", targetScore: 4400, maxMoves: 20, tip: "⚡ Sağdaki Deneme Şimşeğini kullan & 4'lü eşleştir!" },
+            3: { title: "Minotor'un Labirenti", desc: "T veya L şeklinde 5 taşı eşleştirerek ardışık Kombo ve 3x3 Bomba patlat!", targetScore: 6500, maxMoves: 20, tip: "🔥 T-şeklinde 5 taş eşleştirerek Kombo & Bomba patlat!" },
             4: { title: "Medusa'nın Gözyaşları", desc: "5 taşı düz birleştirerek tek rengi yok eden ZEUS KÜRESİ yarat!", targetScore: 10000, maxMoves: 20, tip: "🌈 Düz 5'li eşleştirerek Zeus Küresi yarat!" },
             5: { title: "Pegasus'un Kanatları", desc: "Kahramanının ilahi gücünü serbest bırak ve Onboarding eğitimini tamamla!", targetScore: 14000, maxMoves: 20, tip: "🛡️ 'Yetenek Kullan' butonuna basarak kahraman gücünü patlat!" },
-            6: { title: "İkarus'un Düşüşü", desc: "Güneşe çok yaklaşmadan hedefine ulaşmaya çalış, hamlelerini dikkatli seç.", targetScore: 23500, maxMoves: 20 },
+            6: { title: "İkarus'un Düşüşü", desc: "Güneşe çok yaklaşmadan hedefine ulaşmaya çalış, hamlelerini dikkatli seç.", targetScore: 17500, maxMoves: 22 },
             7: { title: "Nemea Aslanı", desc: "Yenilmez postu aşmak için büyük kombolar yaparak aslanı dize getir.", targetScore: 27000, maxMoves: 20 },
             8: { title: "Lerna Ejderhası", desc: "Kesilen her başın yerine iki tane çıkmadan seri eşleştirmeler yap.", targetScore: 30500, maxMoves: 20 },
             9: { title: "Erymanthos Yaban Domuzu", desc: "Öfkeli canavarı yormak için tahtadaki toprak elementlerini temizle.", targetScore: 34000, maxMoves: 20 },
@@ -12723,11 +12734,14 @@ function openModal(modalId) {
             const el = document.getElementById('game-moves');
             if (!el) return;
             el.innerText = gameMoves; el.textContent = gameMoves;
-            if (gameMoves <= 3 && gameMoves > 0) {
+            const grid = document.getElementById('game-grid');
+            if (gameMoves <= 3 && gameMoves > 0 && typeof gameScore !== 'undefined' && typeof gameTarget !== 'undefined' && gameScore < gameTarget) {
                 el.classList.add('moves-clutch');
+                if (grid) grid.classList.add('clutch-warning-pulse');
                 if (gameMoves === 3) playEpicCallout('clutch');
             } else {
                 el.classList.remove('moves-clutch');
+                if (grid) grid.classList.remove('clutch-warning-pulse');
             }
         }
 
