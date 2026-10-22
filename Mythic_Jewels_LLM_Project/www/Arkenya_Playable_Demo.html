@@ -812,6 +812,10 @@
             background-position: center top;
             background-attachment: scroll;
             padding-top: 0 !important;
+            transition: background-image 0.5s ease-in-out;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
         }
 
         .map-top-bar {
@@ -852,22 +856,27 @@
         }
 
         
-        /* ZONE QUICK NAV BAR & PILLS (Requirement 4) */
-        .map-zone-quick-nav {
+        /* UNIFIED COMPACT ZONE NAVIGATION CONSOLE (Requirements 4 & 7) */
+        .map-zone-header-wrap {
+            position: sticky;
+            top: 52px;
+            z-index: 240;
+            margin: 2px 12px 6px;
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.96) 0%, rgba(9, 14, 26, 0.98) 100%);
+            border: 1.5px solid rgba(245, 197, 66, 0.45);
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.75), inset 0 1px 2px rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+
+        .map-zone-quick-nav-bar {
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 8px;
-            padding: 6px 14px;
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.94) 0%, rgba(9, 14, 26, 0.96) 100%);
-            border: 1.5px solid rgba(245, 197, 66, 0.4);
-            border-radius: 16px;
-            margin: 4px 14px 6px;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.7), inset 0 1px 2px rgba(255,255,255,0.1);
-            position: sticky;
-            top: 56px;
-            z-index: 240;
-            backdrop-filter: blur(8px);
+            padding: 7px 12px 5px;
+            border-bottom: 1px solid rgba(245, 197, 66, 0.18);
         }
 
         .zone-nav-arrow {
@@ -885,6 +894,7 @@
             cursor: pointer;
             transition: all 0.15s ease;
             box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            flex-shrink: 0;
         }
 
         .zone-nav-arrow:active {
@@ -905,38 +915,35 @@
             letter-spacing: 0.5px;
             cursor: pointer;
             text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .zone-pills-row {
             display: flex;
-            gap: 8px;
-            padding: 4px 14px 8px;
+            gap: 6px;
+            padding: 5px 10px 7px;
             overflow-x: auto;
             scrollbar-width: none;
-            position: sticky;
-            top: 104px;
-            z-index: 239;
-            backdrop-filter: blur(6px);
             justify-content: flex-start;
             scroll-snap-type: x mandatory;
             -webkit-overflow-scrolling: touch;
         }
-        .zone-pills-row .zone-pill-btn {
-            scroll-snap-align: center;
-            flex-shrink: 0;
-        }
         .zone-pills-row::-webkit-scrollbar { display: none; }
 
         .zone-pill-btn {
-            padding: 5px 10px;
-            border-radius: 14px;
-            background: rgba(15, 23, 42, 0.88);
-            border: 1px solid rgba(245, 197, 66, 0.3);
+            padding: 4px 10px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(245, 197, 66, 0.25);
             color: #cbd5e1;
             font-size: 10px;
             font-weight: 800;
             cursor: pointer;
             white-space: nowrap;
+            flex-shrink: 0;
+            scroll-snap-align: center;
             transition: all 0.2s ease;
         }
 
@@ -5260,21 +5267,23 @@
                     <button class="map-tab-btn" id="btn-tab-list" onclick="setMapTab('list')">📜 ETAPLAR & GEÇMİŞ</button>
                 </div>
 
-                <!-- QUICK ZONE NAVIGATION BAR & BIOME JUMP (Requirements 4 & 7: Bölgeler Arası Yönlendirme ve Temalar) -->
-                <div class="map-zone-quick-nav" id="map-zone-quick-nav">
-                    <button class="zone-nav-arrow" id="btn-zone-prev" onclick="navigateMapZone(-1)" title="Önceki Bölge">◀</button>
-                    <div class="zone-nav-chip" id="zone-current-chip" onclick="cycleNextZone()">
-                        <span id="zone-chip-icon">🏛️</span>
-                        <span id="zone-chip-title">BÖLGE 1: KADİM TAPINAK (1-10)</span>
+                <!-- UNIFIED COMPACT ZONE NAVIGATION CONSOLE (Requirements 4 & 7) -->
+                <div class="map-zone-header-wrap" id="map-zone-quick-nav">
+                    <div class="map-zone-quick-nav-bar">
+                        <button class="zone-nav-arrow" id="btn-zone-prev" onclick="navigateMapZone(-1)" title="Önceki Bölge">◀</button>
+                        <div class="zone-nav-chip" id="zone-current-chip" onclick="cycleNextZone()">
+                            <span id="zone-chip-icon">🏛️</span>
+                            <span id="zone-chip-title">BÖLGE 1: KADİM TAPINAK (1-10)</span>
+                        </div>
+                        <button class="zone-nav-arrow" id="btn-zone-next" onclick="navigateMapZone(1)" title="Sonraki Bölge">▶</button>
                     </div>
-                    <button class="zone-nav-arrow" id="btn-zone-next" onclick="navigateMapZone(1)" title="Sonraki Bölge">▶</button>
-                </div>
-                <div class="zone-pills-row" id="zone-pills-row">
-                    <button class="zone-pill-btn active" id="zone-pill-1" onclick="jumpToZone(1)">🏛️ 1. Vadi</button>
-                    <button class="zone-pill-btn" id="zone-pill-2" onclick="jumpToZone(2)">🌊 2. Fırtına</button>
-                    <button class="zone-pill-btn" id="zone-pill-3" onclick="jumpToZone(3)">🔥 3. Yeraltı</button>
-                    <button class="zone-pill-btn" id="zone-pill-4" onclick="jumpToZone(4)">❄️ 4. Titan</button>
-                    <button class="zone-pill-btn" id="zone-pill-5" onclick="jumpToZone(5)">⚡ 5. Zirve</button>
+                    <div class="zone-pills-row" id="zone-pills-row">
+                        <button class="zone-pill-btn active" id="zone-pill-1" onclick="jumpToZone(1)">🏛️ 1. Vadi</button>
+                        <button class="zone-pill-btn" id="zone-pill-2" onclick="jumpToZone(2)">🌊 2. Fırtına</button>
+                        <button class="zone-pill-btn" id="zone-pill-3" onclick="jumpToZone(3)">🔥 3. Yeraltı</button>
+                        <button class="zone-pill-btn" id="zone-pill-4" onclick="jumpToZone(4)">❄️ 4. Titan</button>
+                        <button class="zone-pill-btn" id="zone-pill-5" onclick="jumpToZone(5)">⚡ 5. Zirve</button>
+                    </div>
                 </div>
 
                 <!-- VISUAL MAP VIEW WITH SVG WINDING PATH -->
@@ -9423,7 +9432,7 @@
 
             if (mapListView) {
                 mapListView.classList.toggle('active', tabMode === 'list');
-                mapListView.style.display = (tabMode === 'list' ? 'flex' : 'none');
+                mapListView.style.setProperty('display', tabMode === 'list' ? 'flex' : 'none', 'important');
             }
 
             const screenWorldMap = document.getElementById('screen-worldmap');
@@ -9549,20 +9558,32 @@
                 const normWave = Math.sin(i * 0.45) * 0.55 + Math.cos(i * 0.18) * 0.35 + Math.sin(i * 0.85) * 0.10;
                 const x = Math.round(cCenter + (normWave * maxAmp));
 
-                // 1. ZONE DIVIDER BANNER BEFORE LEVEL 1, 11, 21, 31, 41 (Requirements 4 & 7)
+                // 1. ZONE TRANSITION ARCHWAY BANNERS (Placed cleanly at transitions, anchor-1 kept transparent)
                 if (i === 1 || i === 11 || i === 21 || i === 31 || i === 41) {
                     const zData = (typeof ZONE_DATA !== 'undefined' && ZONE_DATA[zone]) ? ZONE_DATA[zone] : { icon: "🏛️", levels: "1-10", desc: "Kadim Topraklar", name: "Bölge" };
                     const banner = document.createElement('div');
                     banner.className = `zone-trail-banner zone-${zone}`;
                     banner.id = `zone-anchor-${zone}`;
-                    banner.style.top = (y - 58) + 'px';
-                    banner.innerHTML = `
-                        <div class="zone-trail-crest">${zData.icon}</div>
-                        <div class="zone-trail-info">
-                            <div class="zone-trail-subtitle">BÖLGE ${zone} (${zData.levels}) • ${zData.desc}</div>
-                            <div class="zone-trail-title">${zData.name.toUpperCase()}</div>
-                        </div>
-                    `;
+                    if (i === 1) {
+                        // Invisible anchor for zone 1 to preserve scroll jump without covering node 1
+                        banner.style.top = '10px';
+                        banner.style.height = '1px';
+                        banner.style.padding = '0';
+                        banner.style.opacity = '0';
+                        banner.style.pointerEvents = 'none';
+                        banner.style.border = 'none';
+                        banner.style.background = 'transparent';
+                    } else {
+                        // Mythic gate archway between major biomes
+                        banner.style.top = (y - 54) + 'px';
+                        banner.innerHTML = `
+                            <div class="zone-trail-crest">${zData.icon}</div>
+                            <div class="zone-trail-info">
+                                <div class="zone-trail-subtitle">BÖLGE ${zone} (${zData.levels}) • ${zData.desc}</div>
+                                <div class="zone-trail-title">${zData.name.toUpperCase()}</div>
+                            </div>
+                        `;
+                    }
                     container.appendChild(banner);
                 }
 
@@ -9736,6 +9757,9 @@
 
                     const card = document.createElement('div');
                     card.className = `stage-chronicle-card ${isBoss ? 'boss-card' : ''} ${isCurrent ? 'active-card' : ''}`;
+                    card.style.cursor = 'pointer';
+                    card.style.touchAction = 'manipulation';
+                    card.onclick = () => openLevelPreview(i);
                     card.innerHTML = `
                         <div class="stage-chronicle-left">
                             <div class="stage-chronicle-icon">${icon}</div>
@@ -9749,7 +9773,7 @@
                                 </div>
                             </div>
                         </div>
-                        <button class="stage-chronicle-btn ${!isUnlocked ? 'locked-btn' : (isCompleted ? 'replay-btn' : 'play-btn')}" onclick="openLevelPreview(${i})">
+                        <button class="stage-chronicle-btn ${!isUnlocked ? 'locked-btn' : (isCompleted ? 'replay-btn' : 'play-btn')}" onclick="event.stopPropagation(); openLevelPreview(${i})">
                             ${!isUnlocked ? '🔒 KİLİTLİ' : (isCompleted ? '🔄 TEKRAR' : '⚡ OYNA')}
                         </button>
                     `;
