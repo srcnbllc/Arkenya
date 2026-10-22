@@ -909,15 +909,21 @@
 
         .zone-pills-row {
             display: flex;
-            gap: 6px;
-            padding: 2px 14px 8px;
+            gap: 8px;
+            padding: 4px 14px 8px;
             overflow-x: auto;
             scrollbar-width: none;
             position: sticky;
             top: 104px;
             z-index: 239;
-            backdrop-filter: blur(4px);
-            justify-content: center;
+            backdrop-filter: blur(6px);
+            justify-content: flex-start;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+        .zone-pills-row .zone-pill-btn {
+            scroll-snap-align: center;
+            flex-shrink: 0;
         }
         .zone-pills-row::-webkit-scrollbar { display: none; }
 
@@ -1052,15 +1058,15 @@
             gap: 5px;
             padding: 4px 10px;
             border-radius: 12px;
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.94) 0%, rgba(9, 14, 26, 0.96) 100%);
-            border: 1.2px solid rgba(245, 197, 66, 0.4);
-            box-shadow: 0 4px 14px rgba(0,0,0,0.75), inset 0 1px 2px rgba(255,255,255,0.12);
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.96) 0%, rgba(9, 14, 26, 0.98) 100%);
+            border: 1.2px solid rgba(245, 197, 66, 0.45);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.85), inset 0 1px 2px rgba(255,255,255,0.15);
             white-space: nowrap;
             pointer-events: auto;
             cursor: pointer;
-            z-index: 12;
-            transition: all 0.2s ease;
-            max-width: 170px;
+            z-index: 15;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            max-width: clamp(120px, 36vw, 175px);
             overflow: hidden;
             text-overflow: ellipsis;
         }
@@ -1420,27 +1426,38 @@
             50% { box-shadow: 0 0 40px rgba(0, 210, 255, 1), inset 0 2px 8px rgba(255,255,255,0.9); }
             100% { box-shadow: 0 0 20px rgba(0, 210, 255, 0.6), inset 0 2px 4px rgba(255,255,255,0.5); }
         }
-            50% { box-shadow: 0 0 40px rgba(0, 210, 255, 1), inset 0 2px 8px rgba(255,255,255,0.9); }
-            100% { box-shadow: 0 0 20px rgba(0, 210, 255, 0.6), inset 0 2px 4px rgba(255,255,255,0.5); }
-        }
 
         .active-node-pointer {
             position: absolute;
-            top: -32px;
+            top: -44px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0, 210, 255, 0.95);
-            color: #fff;
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            color: #ffffff;
             font-size: 10px;
             font-weight: 900;
-            padding: 5px 10px;
+            padding: 4px 10px;
             border-radius: 12px;
-            border: 1.5px solid #fff;
+            border: 1.5px solid #ffffff;
             white-space: nowrap;
-            box-shadow: 0 4px 12px rgba(0, 210, 255, 0.6);
+            box-shadow: 0 4px 14px rgba(0, 210, 255, 0.75);
             pointer-events: none;
-            animation: bouncePointer 1.5s infinite;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            animation: bouncePointer 1.5s infinite ease-in-out;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+            z-index: 25;
+        }
+
+        .active-node-pointer::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 6px solid #0284c7;
         }
 
         @keyframes bouncePointer {
@@ -4913,20 +4930,6 @@
 
             <!-- Global Fixed Bottom Navigation Bar -->
             <div class="bottom-nav" id="global-bottom-nav" style="display: none;">
-                <div class="nav-item active" onclick="showScreen('screen-mainmenu')">
-                    <span class="nav-icon">
-                        <svg class="mythic-svg-icon" viewBox="0 0 24 24">
-                            <polygon points="12,2 2,7 22,7" fill="rgba(245,197,66,0.35)" stroke="url(#mythicGoldGrad)" stroke-width="1.8"/>
-                            <line x1="2" y1="7" x2="22" y2="7" stroke="url(#mythicGoldGrad)" stroke-width="2"/>
-                            <line x1="4.5" y1="9" x2="4.5" y2="18" stroke="url(#mythicGoldGrad)" stroke-width="2"/>
-                            <line x1="9.5" y1="9" x2="9.5" y2="18" stroke="url(#mythicGoldGrad)" stroke-width="2"/>
-                            <line x1="14.5" y1="9" x2="14.5" y2="18" stroke="url(#mythicGoldGrad)" stroke-width="2"/>
-                            <line x1="19.5" y1="9" x2="19.5" y2="18" stroke="url(#mythicGoldGrad)" stroke-width="2"/>
-                            <rect x="2" y="18" width="20" height="3" rx="0.5" fill="rgba(245,197,66,0.35)" stroke="url(#mythicGoldGrad)" stroke-width="1.8"/>
-                        </svg>
-                    </span>
-                    <span>ANA MENÜ</span>
-                </div>
                 <div class="nav-item" onclick="openWorldMap()">
                     <span class="nav-icon">
                         <svg class="mythic-svg-icon" viewBox="0 0 24 24">
@@ -9050,7 +9053,7 @@
             document.querySelectorAll('#global-bottom-nav .nav-item').forEach(item => {
                 item.classList.remove('active');
                 const onclickAttr = item.getAttribute('onclick') || '';
-                if (screenId === 'screen-mainmenu' && onclickAttr.includes('screen-mainmenu')) item.classList.add('active');
+                // ANA MENU nav-item removed (Req 9)
                 if (screenId === 'screen-worldmap' && onclickAttr.includes('openWorldMap')) item.classList.add('active');
                 if (screenId === 'screen-hero' && onclickAttr.includes('openHeroScreen')) item.classList.add('active');
                 if (screenId === 'screen-store' && onclickAttr.includes('openStoreScreen')) item.classList.add('active');
@@ -9445,7 +9448,15 @@
 
             for (let z = 1; z <= 5; z++) {
                 const pill = document.getElementById(`zone-pill-${z}`);
-                if (pill) pill.classList.toggle('active', z === currentViewingZone);
+                if (pill) {
+                    const isActive = (z === currentViewingZone);
+                    pill.classList.toggle('active', isActive);
+                    if (isActive && typeof pill.scrollIntoView === 'function') {
+                        try {
+                            pill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                        } catch(e){}
+                    }
+                }
             }
 
             // Dynamically update background artwork for the active zone (Requirement 7)
