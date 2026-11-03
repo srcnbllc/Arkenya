@@ -12096,9 +12096,11 @@ function playTTSFallback(text) {
 
             // 2. Thematic Story Voice Narration - ONLY on Theme Starting Levels (Level 1, 11, 21, 31, 41)
             const isThemeStart = ((levelId - 1) % 10 === 0);
+            const zoneNum = Math.ceil(levelId / 10);
+            const zData = (typeof ZONE_DATA !== 'undefined' && ZONE_DATA[zoneNum]) ? ZONE_DATA[zoneNum] : { icon: '🏛️' };
             const headerZoneIcon = document.getElementById('preview-header-zone-icon');
             if (headerZoneIcon) {
-                headerZoneIcon.textContent = lvlEmblem;
+                headerZoneIcon.innerHTML = zData.icon || '🏛️';
             }
 
             const themeTitleEl = document.getElementById('preview-theme-title');
