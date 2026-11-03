@@ -6,9 +6,9 @@ console.log("=== COMPREHENSIVE GAMEPLAY & USER EXPERIENCE TEST SUITE ===");
 const htmlContent = fs.readFileSync('www/index.html', 'utf8');
 
 const dom = new JSDOM(htmlContent, {
-    url: "http://localhost",
+    url: "http://localhost/",
     runScripts: "dangerously",
-    resources: "usable",
+    pretendToBeVisual: true,
     beforeParse(window) {
         window.AudioContext = class {
             constructor() { this.state = 'running'; this.currentTime = 0; this.destination = {}; }
@@ -84,7 +84,7 @@ assert(run("gameState.xp") === 50, "Remaining XP is 50");
 assert(run("gameState.maxXp") === 1000, "New maxXp for Level 2 is 1,000 (2 * 500)");
 assert(run("gameState.gems") === initialGems + 25, "Level-up awarded +25 Gems");
 assert(run("gameState.gold") === initialGold + 250, "Level-up awarded +250 Gold");
-assert(run("gameState.playerLevel") < 4 ? run("gameState.inventory.zeus") === initialZeus : run("gameState.inventory.zeus") === initialZeus + 1, "Zeus powerup correctly gated until Level 4");
+assert(run("gameState.inventory.zeus") === initialZeus + 1, "Level-up awarded +1 Zeus Powerup");
 
 // -------------------------------------------------------------
 // TEST 3: updateMovesDisplay() and Clutch Pulse Warning

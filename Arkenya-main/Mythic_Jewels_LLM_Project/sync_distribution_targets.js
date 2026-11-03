@@ -19,14 +19,20 @@ function getHash(filePath) {
     return crypto.createHash('sha256').update(data).digest('hex');
 }
 
-const sourceData = fs.readFileSync(sourcePath);
+let sourceData = fs.readFileSync(sourcePath);
+if (sourceData.length < 800000 || sourceData.toString('utf8').includes('truncated for diff preview')) {
+    console.warn(`⚠️ WARNING: ${sourcePath} was truncated (${sourceData.length} bytes). Restoring from index.html...`);
+    sourceData = fs.readFileSync('index.html');
+    fs.writeFileSync(sourcePath, sourceData);
+}
+
 const sourceHash = crypto.createHash('sha256').update(sourceData).digest('hex');
 console.log(`Source [${sourcePath}] SHA-256: ${sourceHash} (${sourceData.length} bytes)`);
 
 let allMatched = true;
 
 targets.forEach(tgt => {
-    if (fs.existsSync(tgt) || tgt.startsWith('android/') || tgt.startsWith('ios/')) {
+    if (fs.existsSync(tgt) || tgt.startsWith('android/')) {
         const dir = require('path').dirname(tgt);
         if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
         fs.writeFileSync(tgt, sourceData);

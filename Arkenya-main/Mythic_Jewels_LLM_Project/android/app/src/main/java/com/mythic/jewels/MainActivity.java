@@ -14,36 +14,26 @@ public class MainActivity extends BridgeActivity {
         // Keep display awake during active gameplay
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        // Crucial for Android Emulator & Mobile WebView audio playback:
-        // Disabling mediaPlaybackRequiresUserGesture allows HTML5 audio, Web Audio synthesizer
-        // and story audio streams to play reliably without getting blocked by Chromium.
+        // Crucial for Android Emulator & Mobile WebView 60FPS performance and audio playback:
         try {
             WebView webView = getBridge().getWebView();
             if (webView != null) {
+                webView.setVerticalScrollBarEnabled(false);
+                webView.setHorizontalScrollBarEnabled(false);
+                webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
+                // Enable GPU hardware acceleration for smooth 60fps map & SVG rendering
                 webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+
                 WebSettings settings = webView.getSettings();
                 settings.setMediaPlaybackRequiresUserGesture(false);
                 settings.setAllowFileAccess(true);
                 settings.setAllowContentAccess(true);
                 settings.setDomStorageEnabled(true);
                 settings.setDatabaseEnabled(true);
+                settings.setCacheMode(WebSettings.LOAD_DEFAULT);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        try {
-            WebView webView = getBridge().getWebView();
-            if (webView != null) {
-                webView.evaluateJavascript("if (typeof handleNativeBackAction === 'function') { handleNativeBackAction(); }", null);
-                return;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        super.onBackPressed();
     }
 }

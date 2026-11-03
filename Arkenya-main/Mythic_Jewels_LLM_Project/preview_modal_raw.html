@@ -1,0 +1,154 @@
+ POPUP -->
+            <div class="modal-overlay" id="modal-level-preview" onclick="if(event.target === this && (Date.now() - (window.lastModalOpenTime || 0) > 450)) closeModal('modal-level-preview')">
+                <div class="modal-card" style="width: 92%; max-width: 410px; padding: 16px 16px 12px; box-sizing: border-box; border: 1.5px solid var(--gold-primary); background: radial-gradient(circle at top, #151e33 0%, #090e1c 100%); box-shadow: 0 16px 45px rgba(0,0,0,0.9), 0 0 25px rgba(245,197,66,0.15); border-radius: 20px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;">
+                    
+                    <!-- Fixed Modal Header -->
+                    <div class="modal-preview-header" style="flex-shrink: 0;">
+                    
+                    <!-- Top Bar: Title, Navigation Arrows & Top-Right Audio Button -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 6px;">
+                        <button id="btn-preview-prev" class="btn-nav-arrow" onclick="navigatePreviewLevel(-1)" title="Önceki Bölüm">◀</button>
+                        
+                        <div style="text-align: center; flex: 1; min-width: 0;">
+                            <div id="preview-badge" style="font-size: 10px; font-weight: 800; color: var(--gold-light); letter-spacing: 0.8px; text-transform: uppercase;">BÖLGE 1 • KRİSTAL VADİ</div>
+                            <div class="modal-title" id="preview-title" style="font-size: 15.5px; margin-top: 2px; color: #fff; text-shadow: 0 0 12px rgba(245, 197, 66, 0.4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">BÖLÜM 1</div>
+                        </div>
+
+                        <button id="btn-preview-next" class="btn-nav-arrow" onclick="navigatePreviewLevel(1)" title="Sonraki Bölüm">▶</button>
+
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <button id="btn-preview-listen-story" class="btn-preview-story" onclick="togglePreviewStoryAudio()" title="Hikayeyi Dinle veya Duraklat">
+                                <span id="preview-story-icon">🔊</span>
+                                <span id="preview-story-text">DİNLE</span>
+                                <div class="preview-soundwave" id="preview-soundwave" style="display: none;">
+                                    <span></span><span></span><span></span><span></span>
+                                </div>
+                            </button>
+                            <button type="button" id="btn-preview-close" class="modal-close" style="position: static; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.22); font-size: 15px; font-weight: 900; cursor: pointer; color: #f1f5f9; display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0;" onclick="closeModal('modal-level-preview', true)" title="Kapat">✕</button>
+                        </div>
+                    </div>
+
+                    </div>
+
+                    <!-- Scrollable Content Body for Mobile Comfort -->
+                    <div class="modal-preview-scroll-body" style="flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-right: 2px; margin-bottom: 6px;">
+
+                    <!-- Stage Emblem & Status Mode Banner (Issue 3: İlk Kez Oynanacak vs Daha Önce Oynanmış Durak) -->
+                    <div id="preview-stage-status-card" style="display:flex; align-items:center; gap:10px; background:linear-gradient(135deg, rgba(245,197,66,0.14) 0%, rgba(15,23,42,0.95) 100%); border:1.5px solid rgba(245,197,66,0.45); border-radius:14px; padding:8px 12px; margin-bottom:10px; text-align:left;">
+                        <div id="preview-stage-svg-emblem" style="width:38px; height:38px; border-radius:50%; background:radial-gradient(circle, rgba(245,197,66,0.28) 0%, rgba(15,23,42,0.95) 100%); border:1.5px solid #f5c542; display:flex; align-items:center; justify-content:center; color:#ffe885; flex-shrink:0; padding:6px; box-sizing:border-box;">🏛️</div>
+                        <div style="flex:1; min-width:0;">
+                            <div id="preview-stage-mode-badge" style="font-size:9.5px; font-weight:900; color:#38bdf8; letter-spacing:0.4px; text-transform:uppercase;">🌟 İLK KEZ OYNANACAK DURAK</div>
+                            <div id="preview-stage-goal-summary" style="font-size:11px; color:#e2e8f0; font-weight:700; margin-top:2px; line-height:1.3;">Oyun Bilgileri: Hedef skora hamle bitmeden ulaş ve durağı fethet!</div>
+                        </div>
+                    </div>
+
+                    <!-- Mythic Parchment Story Box with Continuous Saga Lore -->
+                    <div class="preview-saga-box" style="background: linear-gradient(145deg, rgba(245,197,66,0.08) 0%, rgba(15,23,42,0.9) 100%); border: 1.5px solid rgba(245, 197, 66, 0.35); border-radius: 14px; padding: 10px 12px; margin-bottom: 10px; text-align: left; position: relative; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), 0 4px 15px rgba(0,0,0,0.3);">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
+                            <span id="preview-theme-title" style="font-size: 11px; font-weight: 800; color: var(--gold-primary); text-transform: uppercase; letter-spacing: 0.5px;">📜 KADİM DESTAN</span>
+                            <span id="preview-theme-status" style="font-size: 9.5px; background: rgba(245, 197, 66, 0.15); color: var(--gold-light); padding: 2px 6px; border-radius: 6px; font-weight: 700;">DURAK BİLGİSİ</span>
+                        </div>
+                        <div id="preview-story" style="font-size: 11px; color: #e2e8f0; font-style: italic; line-height: 1.45; max-height: none; overflow-y: visible; font-size: 12.5px; color: #f8fafc; line-height: 1.5;">
+                            "Hikaye yükleniyor..."
+                        </div>
+                    </div>
+
+                    <!-- Target & Moves Info Chips -->
+                    <div style="display: flex; gap: 8px; margin-bottom: 10px; justify-content: space-between;">
+                        <div style="flex: 1; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 8px 6px; text-align: center;">
+                            <div style="font-size: 9.5px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">🎯 HEDEF SKOR</div>
+                            <div style="font-size: 14.5px; font-weight: 900; color: var(--gold-light); margin-top: 2px;" id="preview-target">4,000</div>
+                        </div>
+                        <div style="flex: 1; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 8px 6px; text-align: center;">
+                            <div style="font-size: 9.5px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">🦶 TOPLAM HAMLE</div>
+                            <div style="font-size: 14.5px; font-weight: 900; color: var(--accent-blue); margin-top: 2px;" id="preview-moves">25</div>
+                        </div>
+                    </div>
+
+                    <!-- Expected Level Victory Rewards Banner -->
+                    <div id="preview-reward-preview-box" style="background: rgba(245, 197, 66, 0.08); border: 1px solid rgba(245, 197, 66, 0.25); border-radius: 10px; padding: 7px 12px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+                        <div style="font-size: 10.5px; color: #cbd5e1; display: flex; align-items: center; gap: 6px;">
+                            <span style="font-size: 14px;">🏆</span>
+                            <span style="font-weight: 800; color: var(--gold-light);">Zafer Ödülü:</span>
+                        </div>
+                        <div id="preview-reward-preview-val" style="font-size: 12px; font-weight: 900; color: var(--gold-primary);">
+                            +55 💰 • +1 💎
+                        </div>
+                    </div>
+
+                    <!-- Level 5+ Hero Ability Announcement & Guide Card -->
+                    <div id="preview-hero-ability-card" style="display: none; margin-bottom: 12px; background: radial-gradient(circle, rgba(245,197,66,0.15) 0%, rgba(15,23,42,0.85) 100%); border: 1.5px solid var(--gold-primary); border-radius: 12px; padding: 10px 12px; text-align: left; box-shadow: 0 4px 15px rgba(245,197,66,0.15);">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                            <span style="font-size: 10px; font-weight: 800; color: #22c55e; letter-spacing: 0.5px; text-transform: uppercase;">🔓 KAHRAMAN YETENEĞİ AKTİF!</span>
+                            <span id="preview-hero-tag" style="font-size: 9px; background: rgba(245,197,66,0.2); color: var(--gold-light); padding: 1px 6px; border-radius: 6px; font-weight: 800;">ARKENYA</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div id="preview-hero-icon" style="font-size: 24px;">⚔️</div>
+                            <div style="flex: 1;">
+                                <div id="preview-ability-title" style="font-size: 12px; font-weight: 900; color: #fff;">İLAHİ DARBE (Divine Smite)</div>
+                                <div id="preview-ability-desc" style="font-size: 10px; color: #cbd5e1; line-height: 1.3; margin-top: 2px;">
+                                    Kombolarla sayacı %100 doldur, sıkıştığında tahtadaki 6 engeli patlat!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pre-Game Optional Boosters (Bölüm Öncesi İsteğe Bağlı Takviyeler) -->
+                    <div id="preview-preboosters-wrap" style="margin-bottom: 14px; background: rgba(0,0,0,0.3); border: 1px solid rgba(245, 197, 66, 0.2); border-radius: 12px; padding: 8px 10px;">
+                        <div style="font-size: 10px; font-weight: 800; color: var(--gold-primary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                            <span>⚡ BÖLÜM TAKVİYELERİ</span>
+                            <span style="font-size: 9px; color: #94a3b8; font-weight: 600;">İsteğe Bağlı</span>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <div id="chip-prebooster-moves" class="prebooster-chip" onclick="togglePreBooster('moves')" style="flex: 1; padding: 6px 6px; border-radius: 9px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.04); cursor: pointer; text-align: center; transition: all 0.2s;">
+                                <div style="font-size: 11px; font-weight: 700; color: #cbd5e1;">🛡️ +3 Hamle</div>
+                                <div style="font-size: 9.5px; color: var(--gold-light); font-weight: 800; margin-top: 2px;">100 💰 Altın</div>
+                            </div>
+                            <div id="chip-prebooster-bomb" class="prebooster-chip" onclick="togglePreBooster('bomb')" style="flex: 1; padding: 6px 6px; border-radius: 9px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.04); cursor: pointer; text-align: center; transition: all 0.2s;">
+                                <div style="font-size: 11px; font-weight: 700; color: #cbd5e1;">💥 Hazır Bomba</div>
+                                <div style="font-size: 9.5px; color: var(--gold-light); font-weight: 800; margin-top: 2px;">180 💰 Altın</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Player Progress & Replay Record Box -->
+                    <div id="preview-record-box" style="display: none; background: rgba(34, 197, 94, 0.12); border: 1.5px solid rgba(74, 222, 128, 0.4); border-radius: 14px; padding: 10px 14px; margin-bottom: 12px; text-align: left; box-shadow: 0 4px 16px rgba(0,0,0,0.5);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                            <span style="font-size: 11px; font-weight: 800; color: #4ade80;">👑 EN YÜKSEK SKORUN:</span>
+                            <span id="preview-record-score" style="font-size: 14px; font-weight: 900; color: #fff;">0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <div id="preview-record-stars" style="font-size: 13px;">⭐⭐⭐</div>
+                            <div id="preview-record-plays" style="font-size: 10.5px; font-weight: 800; color: #38bdf8;">🎮 1 Kez Oynandı</div>
+                        </div>
+                        <div style="display: flex; gap: 8px; margin-bottom: 6px; padding: 6px 8px; background: rgba(0,0,0,0.3); border-radius: 8px;">
+                            <div style="flex: 1; font-size: 10.5px; color: #ffe885; font-weight: 700;">💰 Kazanılan: <span id="preview-record-gold">+150 Altın</span></div>
+                            <div style="flex: 1; font-size: 10.5px; color: #38bdf8; font-weight: 700;">💎 Elmas: <span id="preview-record-gems">+2 Elmas</span></div>
+                        </div>
+                        <div style="font-size: 10px; color: #cbd5e1; line-height: 1.35;">
+                            💡 <b>Zafer İpucu:</b> Bu bölümü tekrar oynayarak skor rekorunu kırabilir, ekstra altın ve lig puanı toplayabilirsin!
+                        </div>
+                    </div>
+
+                    <!-- Locked Warning Banner (Gelecek Kilitli Seviyeler İçin) -->
+                    <div id="preview-locked-banner" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1.5px dashed #ef4444; border-radius: 12px; padding: 12px; margin-bottom: 12px; text-align: center;">
+                        <div style="font-size: 26px; margin-bottom: 2px;">🔒</div>
+                        <div style="font-size: 13px; font-weight: 900; color: #fca5a5; letter-spacing: 0.5px;">BU DURAK HENÜZ KİLİTLİ!</div>
+                        <div id="preview-locked-desc" style="font-size: 11px; color: #cbd5e1; margin-top: 4px;">
+                            Bu mitolojik aşamaya geçmek için önce önceki bölümleri zaferle tamamlamalısın.
+                        </div>
+                    </div>
+
+                    </div> <!-- end .modal-preview-scroll-body -->
+
+                    <!-- Sticky Bottom Action Footer (Always Visible on Any Mobile Viewport) -->
+                    <div class="modal-preview-footer-actions" style="flex-shrink: 0; padding-top: 6px; border-top: 1px solid rgba(245, 197, 66, 0.2);">
+                    <button id="btn-preview-start-play" class="btn-action btn-action-gold" style="height: 48px; font-size: 14.5px; width: 100%; margin-bottom: 8px;" onclick="startGameplay()">⚡ OYUNA BAŞLA (⚡ 1 Can)</button>
+                    <button id="btn-preview-next-stage" class="btn-action-gold" style="display: none; height: 44px; font-size: 13.5px; width: 100%; margin-bottom: 8px; border-radius: 12px; background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%); border: 1.5px solid #7dd3fc; color: #ffffff;" onclick="playNextStageFromPreview()">⏭️ SONRAKİ BÖLÜME GEÇ ➔</button>
+                    <button class="btn-action-sub" id="btn-preview-map" style="min-height: 42px; height: auto; padding: 10px 14px; font-size: 13px; font-weight: 800; border-radius: 12px; width: 100%; display: flex; align-items: center; justify-content: center; letter-spacing: 0.5px; line-height: 1.25;" onclick="closeModal('modal-level-preview', true)">⬅️ GERİ / ANA HARİTAYA DÖN</button>
+                    </div> <!-- end .modal-preview-footer-actions -->
+                </div>
+            </div>
+
+            <!-- MODAL: VICTORY (AAA Mythic Score, Star & Progression Showcase) -->
+            <div class="modal-overlay" 

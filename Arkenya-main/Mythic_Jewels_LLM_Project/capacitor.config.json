@@ -5,9 +5,9 @@
   "bundledWebRuntime": false,
   "backgroundColor": "#04060a",
   "android": {
-    "allowMixedContent": false,
+    "allowMixedContent": true,
     "captureInput": true,
-    "webContentsDebuggingEnabled": false
+    "webContentsDebuggingEnabled": true
   },
   "ios": {
     "contentInset": "automatic",
@@ -28,7 +28,7 @@
       "overlay": true
     },
     "ScreenOrientation": {
-      "orientation": "unspecified"
+      "orientation": "portrait"
     }
   }
 }
