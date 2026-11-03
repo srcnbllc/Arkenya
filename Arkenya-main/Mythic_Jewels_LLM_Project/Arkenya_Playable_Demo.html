@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https:; img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; connect-src 'self' https:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https: capacitor: ionic:; img-src 'self' data: blob: https: capacitor: ionic:; media-src 'self' data: blob: https: capacitor: ionic:; connect-src 'self' https: capacitor: ionic:;">
     <title>ARKENYA: MYTHIC JEWELS — Candy Crush & Zeus Patlatma Efektli Oynanış</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
@@ -54,6 +54,8 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
+            overscroll-behavior: none;
+            -webkit-overflow-scrolling: touch;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -18247,6 +18249,23 @@ function playTTSFallback(text) {
                     closeModal(allModals[i]);
                     return true;
                 }
+            }
+
+            // 1. Gameplay screen back action: Open pause menu gracefully
+            const gameplayScreen = document.getElementById('screen-gameplay');
+            if (gameplayScreen && gameplayScreen.classList.contains('active')) {
+                if (typeof togglePauseModal === 'function') togglePauseModal();
+                return true;
+            }
+
+            // 2. Sub-screens back action: Return to Main Menu before prompting exit
+            const activeSubScreen = ['screen-worldmap', 'screen-hero', 'screen-store'].find(id => {
+                const el = document.getElementById(id);
+                return el && el.classList.contains('active');
+            });
+            if (activeSubScreen) {
+                if (typeof showScreen === 'function') showScreen('screen-mainmenu');
+                return true;
             }
 
             const now = Date.now();
