@@ -49,5 +49,6 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-    <uses-permission android:name="com.android.vending.BILLING" />
+    <!-- Kapali test surecinde sanal odul ekonomisi gecerli oldugu icin BILLING izni devre disi birakildi -->
+    <!-- <uses-permission android:name="com.android.vending.BILLING" /> -->
 </manifest>

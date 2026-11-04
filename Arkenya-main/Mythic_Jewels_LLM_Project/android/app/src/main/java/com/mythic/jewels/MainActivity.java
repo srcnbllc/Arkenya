@@ -21,8 +21,8 @@ public class MainActivity extends BridgeActivity {
                 webView.setVerticalScrollBarEnabled(false);
                 webView.setHorizontalScrollBarEnabled(false);
                 webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
-                // Enable GPU hardware acceleration for smooth 60fps map & SVG rendering
-                webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                // Allow natural hardware-accelerated composition; avoiding offscreen LAYER_TYPE_HARDWARE eliminates Davey stalls & ANR in emulators/devices
+                webView.setLayerType(View.LAYER_TYPE_NONE, null);
 
                 WebSettings settings = webView.getSettings();
                 settings.setMediaPlaybackRequiresUserGesture(false);

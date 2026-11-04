@@ -5506,8 +5506,8 @@
         }
 
     </style>
-    <!-- Stüdyo Kalitesinde Türkçe Kahraman & Anlatıcı Ses Paketi (Zero-GC External Modular Script) -->
-    <script src="assets/audio/narrator_audio_data.js"></script>
+    <!-- Stüdyo Kalitesinde Türkçe Kahraman & Anlatıcı Ses Paketi (Deferred to prevent initial startup parse blocking & ANR) -->
+    <script src="assets/audio/narrator_audio_data.js" defer></script>
         </head>
 <body class="mainmenu-view">
 
@@ -18195,7 +18195,16 @@ function playTTSFallback(text) {
         let lastNativeBackPressTime = 0;
 
         function initCapacitorMobileApp() {
-                if (window.AdGuard && typeof window.AdGuard.initAdMob === "function") window.AdGuard.initAdMob();
+            // Asynchronously initialize AdMob in idle background after UI settles to prevent startup freeze / ANR
+            setTimeout(() => {
+                try {
+                    if (window.AdGuard && typeof window.AdGuard.initAdMob === "function") {
+                        window.AdGuard.initAdMob();
+                    }
+                } catch(e) {
+                    console.warn('[AdGuard] Deferred AdMob init error:', e);
+                }
+            }, 2500);
             if (typeof window !== 'undefined' && window.Capacitor && window.Capacitor.Plugins) {
                 const plugins = window.Capacitor.Plugins;
 
@@ -18270,6 +18279,12 @@ function playTTSFallback(text) {
 
             const now = Date.now();
             if (now - lastNativeBackPressTime < 2200) {
+                if (typeof saveGame === 'function') {
+                    try { saveGame(); } catch(e) {}
+                }
+                if (sharedAudioContext && sharedAudioContext.state === 'running') {
+                    try { sharedAudioContext.suspend(); } catch(e) {}
+                }
                 if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App && window.Capacitor.Plugins.App.exitApp) {
                     window.Capacitor.Plugins.App.exitApp();
                 }
