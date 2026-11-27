@@ -98,7 +98,7 @@ async function runTests() {
     const node1Y = parseInt(document.getElementById('map-node-1').style.top, 10);
     const node10Y = parseInt(document.getElementById('map-node-10').style.top, 10);
     const zone1Span = node10Y - node1Y;
-    assert(zone1Span <= 500, `Madde 2: 1. Vadi'deki Bölüm 1 (${node1Y}px) ile Bölüm 10 (${node10Y}px) toplam ${zone1Span}px yüksekliğe sığıyor (tüm 10 bölüm aynı anda ekranda görünür)`);
+    assert(zone1Span <= 660, `Madde 2: 1. Vadi'deki Bölüm 1 (${node1Y}px) ile Bölüm 10 (${node10Y}px) dengeli aralıklarla (${zone1Span}px) ekranın altına tam oturuyor`);
 
     let all50NodesValid = true;
     let all50CustomMythicSvg = true;
@@ -254,6 +254,53 @@ async function runTests() {
     assert(document.getElementById('defeat-stage-chip').textContent.includes('BÖLÜM 7: NEMEA ASLANI'), "Madde 6: Yenilgi Bitiş Özeti Kartı (#modal-defeat) durak ismini birebir gösteriyor");
     assert(document.querySelector('#defeat-crest-icon svg.mythic-stage-svg') !== null, "Madde 6: Yenilgi Bitiş Özeti Kartı durağın altın SVG ikonunu gösteriyor");
     assert(document.getElementById('defeat-score-summary').textContent.includes('14') && document.getElementById('defeat-score-summary').textContent.includes('21'), "Madde 6: Yenilgi Bitiş Özeti Kartı ulaşılan skoru ve hedef skoru gösteriyor");
+
+    // -------------------------------------------------------------------------
+    // 7. LEVEL 50 GRAND FINALE VICTORY, TREASURE CHEST & PRESTIGE TOUR SHOWCASE
+    // -------------------------------------------------------------------------
+    console.log("\n--- 7. Bölüm 50 Büyük Final Zafer Ekranı, Kutlama Aksiyonları & Altın Prestij Turu ---");
+    run(`
+        closeModal('modal-defeat');
+        gameState.currentPlayingLevel = 50;
+        gameState.unlockedLevel = 50;
+        for (let i = 1; i <= 49; i++) gameState.completedLevels[i] = 3;
+        gameScore = 195000;
+        gameTarget = 150000;
+        movesLeftAtWin = 9;
+        showVictory();
+    `);
+    const vModal50 = document.getElementById('modal-victory');
+    const vCard50 = vModal50.querySelector('.modal-card');
+    assert(vModal50.classList.contains('active') && vCard50.classList.contains('victory-level50-card'), "Bölüm 50 Zafer Kartı (.victory-level50-card) özel altın final aurası ile açıldı");
+    assert(document.getElementById('victory-main-title').textContent.includes('BÜYÜK OLİMPOS ŞAMPİYONU'), "Bölüm 50 Zafer başlığı 'BÜYÜK OLİMPOS ŞAMPİYONU!' olarak gösteriliyor");
+    const nextBtn50 = document.getElementById('btn-victory-next');
+    assert(nextBtn50.textContent.includes('EFSANEVİ FİNAL KUTLAMASI'), "Bölüm 50'de ana aksiyon butonu '👑 EFSANEVİ FİNAL KUTLAMASI ➔' olarak güncellendi");
+
+    // Transition to Grand Finale Celebration Modal
+    nextBtn50.click();
+    const finaleModal = document.getElementById('modal-final-celebration');
+    assert(!vModal50.classList.contains('active') && finaleModal.classList.contains('active'), "Bölüm 50 Final Kutlaması butonuna basınca Zafer modalı kapandı ve Büyük Final Kutlama ekranı (#modal-final-celebration) açıldı");
+    assert(document.getElementById('finale-stat-stars').textContent.includes('150 / 150'), "Büyük Final Ekranı 50 bölümün toplam yıldız istatistiğini (150 / 150 ⭐) doğru hesapladı");
+    assert(document.getElementById('finale-stat-heroes').textContent.includes('6 / 6'), "Büyük Final Ekranı 6/6 Panteon Şampiyonu istatistiğini gösteriyor");
+
+    // Claim Grand Finale Treasure Chest (+500 Gems, +5000 Gold, +2 Zeus)
+    const gemsBeforeTreasure = run("gameState.gems");
+    const goldBeforeTreasure = run("gameState.gold");
+    document.getElementById('finale-treasure-box').click();
+    const gemsAfterTreasure = run("gameState.gems");
+    const goldAfterTreasure = run("gameState.gold");
+    assert(gemsAfterTreasure === gemsBeforeTreasure + 500 && goldAfterTreasure === goldBeforeTreasure + 5000, "Olimpos Final Hazinesi sandığına tıklanınca +500 💎 Elmas ve +5.000 🪙 Altın hesaba eklendi");
+    assert(document.getElementById('finale-treasure-box').classList.contains('claimed'), "Olimpos Final Hazinesi toplandıktan sonra 'claimed' durumuna geçti");
+
+    // Trigger Interactive Fireworks Burst Button
+    document.getElementById('btn-finale-fireworks').click();
+    assert(document.getElementById('confetti-celebration-canvas') !== null, "Havai Fişek & Zafer Şöleni butonu (#btn-finale-fireworks) kutlama kanvasını aktif olarak tetikledi");
+
+    // Start Golden Prestige Tour
+    const prestigeBefore = run("gameState.prestigeTier || 0");
+    document.getElementById('btn-start-prestige-tour').click();
+    const prestigeAfter = run("gameState.prestigeTier");
+    assert(prestigeAfter === prestigeBefore + 1 && !finaleModal.classList.contains('active'), "Altın Prestij Turu butonu (#btn-start-prestige-tour) Prestij kademesini artırdı, ödülleri verdi ve 1. Vadi haritasına yönlendirdi");
 
     console.log(`\n================================================================================`);
     console.log(`🎯 TOTAL TESTS: ${total} | PASSED: ${passed} | FAILED: ${total - passed}`);

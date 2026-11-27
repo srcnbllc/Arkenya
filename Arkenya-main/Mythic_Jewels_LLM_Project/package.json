@@ -4,7 +4,7 @@
   },
   "name": "mythic_jewels_llm_project",
   "description": "Bu klasör, Android ve iOS için geliştirilecek **Mythic Jewels** adlı özgün, oyun içi sanal ekonomi kullanan, gerçek para bahis/kumar içermeyen, fantastik Match-3 + macera + kahraman + boss + hazine + bölüm ilerleme oyununun uçtan uca üretim kaynağıdır.",
-  "version": "1.0.9",
+  "version": "1.0.12",
   "main": "fix_arkenya.js",
   "dependencies": {
     "@capacitor-community/admob": "^8.1.0",
@@ -47,9 +47,11 @@
   },
   "scripts": {
     "test": "node test_user_enhancements.js && node test_performance_and_resilience.js && node test_cinematic_narrator.js && node tests/test_simultaneous_combos_resilience.js",
-    "sync": "npx cap sync",
-    "sync:android": "npx cap sync android",
-    "sync:ios": "npx cap sync ios",
+    "audit:e2e": "node test_master_end_to_end_audit.js",
+    "sync:targets": "node sync_distribution_targets.js",
+    "sync": "node sync_distribution_targets.js && npx cap sync",
+    "sync:android": "node sync_distribution_targets.js && npx cap sync android",
+    "sync:ios": "node sync_distribution_targets.js && npx cap sync ios",
     "build:apk": "cd android && gradlew.bat assembleDebug",
     "build:bundle": "cd android && gradlew.bat bundleRelease",
     "open:android": "npx cap open android",

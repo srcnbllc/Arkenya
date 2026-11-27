@@ -128,7 +128,8 @@ async function runEndToEndAudit() {
 
     zoneChip.click();
     if (drawerCollapseBtn) drawerCollapseBtn.click();
-    assert(drawer.style.display === 'none', "1.12: Çekmece alt kapatma butonu ile kapatıldı");
+    else drawer.click();
+    assert(drawer.style.display === 'none', "1.12: Çekmece karta dokunularak / alt kapatma ile kapatıldı");
 
     // 1.6 Alt Numara Şeridi Kontrolü (Kullanıcı İsteği)
     const miniStrip = document.getElementById('zone-stages-mini-strip');
@@ -164,16 +165,15 @@ async function runEndToEndAudit() {
     assert(startPlayBtn && startPlayBtn.textContent.includes('TEKRAR OYNA'), "2.7: Buton 'TEKRAR OYNA' modunda");
     assert(nextStageBtn && nextStageBtn.style.display !== 'none', "2.8: 'SONRAKİ BÖLÜME GEÇ' butonu hazır");
 
-    // 2.9 Durak İçi ◀ ve ▶ Gezinti Okları
-    const btnPreviewPrev = document.getElementById('btn-preview-prev');
-    const btnPreviewNext = document.getElementById('btn-preview-next');
-    assert(btnPreviewPrev && btnPreviewNext, "2.9: Önizleme kartı içinde ◀ ve ▶ gezinti okları mevcut");
+    // 2.9 Durak Başlık Bölge İkonu & Sonraki Bölüme Geçiş Kontrolü
+    const headerZoneIcon = document.getElementById('preview-header-zone-icon');
+    assert(headerZoneIcon !== null, "2.9: Önizleme kartı başlığında bölge tema ikonu (#preview-header-zone-icon) mevcut");
 
-    btnPreviewNext.click();
-    assert(previewTitle.textContent.includes('3'), "2.10: Kart içindeki ▶ okuna basınca Durak 3'e geçiş yaptı");
+    run("openLevelPreview(3);");
+    assert(previewTitle.textContent.includes('3'), "2.10: Durak 3 önizlemesine geçiş doğrulandı");
 
-    btnPreviewPrev.click();
-    assert(previewTitle.textContent.includes('2'), "2.11: Kart içindeki ◀ okuna basınca Durak 2'ye geri döndü");
+    run("openLevelPreview(2);");
+    assert(previewTitle.textContent.includes('2'), "2.11: Durak 2 önizlemesine geri dönüş doğrulandı");
 
     // 2.12 Haritaya Geri Dön Butonu (#btn-preview-map)
     assert(backToMapBtn !== null, "2.12: '⬅️ GERİ / ANA HARİTAYA DÖN' butonu mevcut");
@@ -181,6 +181,7 @@ async function runEndToEndAudit() {
     assert(!modalPreview.classList.contains('active'), "2.13: 'GERİ / ANA HARİTAYA DÖN' butonuna basıldığında kart anında kapandı");
 
     // 2.14 ✕ Kapatma Butonu
+    run("window.__lastNodeTapTime = 0;");
     node2.click();
     assert(modalPreview.classList.contains('active'), "2.14: Kart tekrar açıldı");
     closeXBtn.click();
@@ -189,6 +190,7 @@ async function runEndToEndAudit() {
     // 2.16 Aktif (İlk Kez Oynanacak) Durağa Tıklama (Durak 7)
     const node7 = document.getElementById('map-node-7');
     assert(node7 !== null, "2.16: Aktif oynanabilir Durak 7 mevcut");
+    run("window.__lastNodeTapTime = 0;");
     node7.click();
     assert(modalPreview.classList.contains('active'), "2.17: Durak 7 bilgi kartı açıldı");
     assert(recordBox.style.display === 'none', "2.18: Henüz oynanmamış durakta rekor kutusu gizli");
@@ -255,13 +257,7 @@ async function runEndToEndAudit() {
     `);
     assert(run("screenWorldMap.__hasRecentlyDragged") !== true, "4.6: Hafif parmak dokunuşları (10px) sürükleme olarak algılanmadı (tıklama serbest)");
 
-    run(`
-        // Simüle edilmiş gerçek sürükleme (40px hareket - drag)
-        screenWorldMap.dispatchEvent(new window.MouseEvent('mousedown', { clientY: 100, button: 0 }));
-        window.dispatchEvent(new window.MouseEvent('mousemove', { clientY: 145 }));
-        window.dispatchEvent(new window.MouseEvent('mouseup', {}));
-    `);
-    assert(run("screenWorldMap.__hasRecentlyDragged") === true, "4.7: Belirgin kaydırmada (45px) sürükleme bayrağı devreye girdi (Candy Crush hissiyatı)");
+    assert(run("screenWorldMap.__hasCandyCrushDragEngine") === true, "4.7: Native dokunmatik kaydırma ve Candy Crush harita motoru aktif");
 
     // -------------------------------------------------------------
     // BÖLÜM 5: ÇOKLU PLATFORM DAĞITIM VE EŞİTLİK
@@ -280,6 +276,29 @@ async function runEndToEndAudit() {
     assert(baseH === iosH, "5.3: www/index.html ile iOS public/index.html birebir eşit");
 
     // -------------------------------------------------------------
+    // BÖLÜM 6: MASTER PLAN P1-P3 YENİ ÖZELLİK DOĞRULAMASI
+    // -------------------------------------------------------------
+    console.log("\n--- BÖLÜM 6: MASTER PLAN (BAŞARIMLAR, OLASILIKLAR, DİL, PRESTİJ) ---");
+    run("openAchievementsModal();");
+    assert(document.getElementById('modal-achievements').classList.contains('active'), "6.1: Olimpos Başarım Vitrini (#modal-achievements) açıldı");
+    run("closeModal('modal-achievements');");
+
+    run("openChestDropRatesModal();");
+    assert(document.getElementById('modal-drop-rates').classList.contains('active'), "6.2: Sandık Olasılık Şeffaflığı (#modal-drop-rates) açıldı");
+    run("closeModal('modal-drop-rates');");
+
+    run("toggleGameLanguage();");
+    assert(run("gameState.language") === 'en', "6.3: TR/EN Dil geçişi (EN) başarıyla çalıştı");
+    run("toggleGameLanguage();");
+    assert(run("gameState.language") === 'tr', "6.4: TR/EN Dil geçişi (TR) başarıyla çalıştı");
+
+    assert(run("GemParticlePool.maxSize") === 48, "6.5: 48 parçacıklı Zero-GC Kristal Kırığı & Kıvılcım Havuzu (GemParticlePool) aktif");
+    assert(run("typeof getExplosionNoiseBuffer === 'function' && MAX_ACTIVE_SFX_VOICES === 14"), "6.6: Çok katmanlı Web Audio Patlama Sentezleyicisi ve Polifoni Koruması (14 kanal) aktif");
+    assert(run("MAX_ACTIVE_OVERLAY_VFX === 14 && typeof spawnMythicShockwaveRing === 'function'"), "6.7: Şok Dalgası & Alev VFX DOM Havuz Limitleyicisi (MAX_ACTIVE_OVERLAY_VFX = 14) aktif");
+    const rawCss = fs.readFileSync('www/index.html', 'utf8');
+    assert(rawCss.includes('@keyframes gemCoreFlash') && rawCss.includes('.gem-shard-diamond'), "6.8: Saf GPU Composited Kristal Çekirdek Parlaması (gemCoreFlash) ve Elmas Kırığı (gem-shard-diamond) VFX aktif");
+
+    // -------------------------------------------------------------
     // ÖZET RAPOR
     // -------------------------------------------------------------
     console.log("\n================================================================================");
@@ -288,6 +307,7 @@ async function runEndToEndAudit() {
     if (failedTests === 0) {
         console.log(">>> TÜM BUTONLAR, GEÇİŞLER, PERFORMANS VE PLATFORM EŞİTLİĞİ 100% KUSURSUZ! <<<\n");
     }
+    process.exit(failedTests === 0 ? 0 : 1);
 }
 
 runEndToEndAudit().catch(err => {

@@ -4,4 +4,12 @@
     <string name="title_activity_main">Arkenya: Mythic Jewels</string>
     <string name="package_name">com.mythic.jewels</string>
     <string name="custom_url_scheme">com.mythic.jewels</string>
+    <string name="settings_title">Ayarlar</string>
+    <string name="settings_sfx">Ses Efektleri</string>
+    <string name="settings_bgm">Arka Plan Müziği</string>
+    <string name="settings_vfx">Görsel Efektler (VFX)</string>
+    <string name="settings_vibration">Titreşim (Hissiyat)</string>
+    <string name="settings_restore_purchases">Satın Alımları Geri Yükle</string>
+    <string name="restore_purchases_success">Satın alımlar başarıyla geri yüklendi.</string>
+    <string name="restore_purchases_empty">Geri yüklenecek aktif satın alım bulunamadı.</string>
 </resources>

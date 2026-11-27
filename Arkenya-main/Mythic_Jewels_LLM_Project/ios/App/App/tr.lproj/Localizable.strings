@@ -1,0 +1,14 @@
+/* 
+  Localizable.strings (Turkish)
+  Arkenya: Mythic Jewels
+*/
+
+"app_name" = "Arkenya: Mythic Jewels";
+"settings_title" = "Ayarlar";
+"settings_sfx" = "Ses Efektleri";
+"settings_bgm" = "Arka Plan Müziği";
+"settings_vfx" = "Görsel Efektler (VFX)";
+"settings_vibration" = "Titreşim (Hissiyat)";
+"settings_restore_purchases" = "Satın Alımları Geri Yükle";
+"restore_purchases_success" = "Satın alımlar başarıyla geri yüklendi.";
+"restore_purchases_empty" = "Geri yüklenecek aktif satın alım bulunamadı.";

@@ -1,0 +1,14 @@
+/* 
+  Localizable.strings (English)
+  Arkenya: Mythic Jewels
+*/
+
+"app_name" = "Arkenya: Mythic Jewels";
+"settings_title" = "Settings";
+"settings_sfx" = "Sound Effects";
+"settings_bgm" = "Background Music";
+"settings_vfx" = "Visual Effects (VFX)";
+"settings_vibration" = "Haptic Vibration";
+"settings_restore_purchases" = "Restore Purchases";
+"restore_purchases_success" = "Purchases restored successfully.";
+"restore_purchases_empty" = "No unconsumed purchases found.";

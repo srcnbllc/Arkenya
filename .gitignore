@@ -31,3 +31,6 @@ Thumbs.db
 # Scratch & temporary workspace files
 scratch/
 **/scratch/
+*.aab
+*.apk
+screen_*.png

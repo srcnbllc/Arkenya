@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Arkenya: Mythic Jewels</string>
+    <string name="title_activity_main">Arkenya: Mythic Jewels</string>
+    <string name="package_name">com.mythic.jewels</string>
+    <string name="custom_url_scheme">com.mythic.jewels</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_sfx">Sound Effects</string>
+    <string name="settings_bgm">Background Music</string>
+    <string name="settings_vfx">Visual Effects (VFX)</string>
+    <string name="settings_vibration">Haptic Vibration</string>
+    <string name="settings_restore_purchases">Restore Purchases</string>
+    <string name="restore_purchases_success">Purchases restored successfully.</string>
+    <string name="restore_purchases_empty">No unconsumed purchases found.</string>
+</resources>
